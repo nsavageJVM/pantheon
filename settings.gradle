@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-rootProject.name='pantheon'
+rootProject.name = 'pantheon'
 include 'consensus'
 include 'consensus:clique'
 include 'consensus:common'
@@ -34,4 +34,5 @@ include 'pantheon'
 include 'services:kvstore'
 include 'testutil'
 include 'util'
- 
+include 'tools-dev'
+

@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.11'
+}
+
+def base =System.getProperty("user.home")
+
+group 'tech.pegasys.pantheon'
+version '0.8.4-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    compile gradleApi()
+    compile(project(":crypto"))
+
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+
+task initDirs {
+
+
+    doLast {
+        println(" running task initDirs with base:= ${base}")
+        mkdir "${base}/chains/private/node1/cdata"
+        mkdir "${base}/chains/private/node2/cdata"
+        mkdir "${base}/chains/private/node3/cdata"
+    }
+
+}
+
+task copyDistribution(type: Copy) {
+    println(" running task copyDistribution with source:= ${base}/pantheon/build/distributions")
+    println(" running task copyDistribution with target:= ${base}/chains/private")
+    from "${base}/pantheon/build/distributions"
+    include "**/*.gz"
+    into "${base}/chains/private"
+    // pantheon-0.8.4-SNAPSHOT.tar.gz
+    rename '(.+)-0.8.4-SNAPSHOT(.+)', '$1$2'
+
+    from "src/main/resources"
+    include "**/*.json"
+    into "${base}/chains/private"
+}
+
+
+
+task unpackDistribution(type: Copy) {
+    println(" running task unpackDistribution with source:= ${base}chains/private/pantheon.tar.gz")
+    println(" running task copyDistribution with target:= ${base}/chains/private")
+    from tarTree("${base}/chains/private/pantheon.tar.gz")
+
+    into "${base}/chains/private"
+
+}
+
