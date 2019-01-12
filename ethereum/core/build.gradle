@@ -49,11 +49,7 @@ dependencies {
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.mockito:mockito-core'
 
-  integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
-
-  integrationTestImplementation 'junit:junit'
-  integrationTestImplementation 'org.assertj:assertj-core'
-  integrationTestImplementation 'org.mockito:mockito-core'
+ 
 
   testSupportImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   testSupportImplementation project(':testutil')
