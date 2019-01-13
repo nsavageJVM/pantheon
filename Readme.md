@@ -32,8 +32,7 @@ if you manage to get this to run on your box then shoud see something on your bo
 run the scripts and you should get a chain composed of a boot node with 2 peers running with clique
 
 ### TODO tools to work with a clique private chai
-1 account management  
-2 contract tools with web3  
-3 gui with kotlin native   
-4 set up as sidechain from a clique mainet
+* [gui](https://github.com/msink/kotlin-libui)   
+* account management /  contract tools  [web3](https://github.com/web3j/web3j)  
+* sidechain
       
