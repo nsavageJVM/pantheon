@@ -2,7 +2,8 @@
 
 ## See project `tools dev`
 
-### Currently implements scripts to configure a private 3 node chain  with a `clique` concenssus loosley following this recipie [Creating a Private Network]('https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Private-Network/')
+### Currently implements scripts to configure a private 3 node chain  with a `clique` concenssus loosley following this recipie 
+[Creating a Private Network](https://docs.pantheon.pegasys.tech/en/latest/Tutorials/Create-Private-Network/)
 
  See module / package keth.tools.utils.ChainUtils main function to create directorys, artifacts and scripts 
 
