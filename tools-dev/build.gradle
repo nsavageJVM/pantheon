@@ -21,7 +21,13 @@ dependencies {
     compile(project(":pantheon"))
     compile(project(":crypto"))
 
+    implementation 'org.web3j:abi'
+    implementation 'org.web3j:core'
+    implementation 'org.web3j:crypto'
 
+    implementation 'org.rocksdb:rocksdbjni'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7'
+    
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 

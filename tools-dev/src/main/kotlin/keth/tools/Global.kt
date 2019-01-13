@@ -12,6 +12,8 @@ object Constants {
 
     val chainBasePath = Paths.get(System.getProperty("user.home"),"chains/private")
 
+    val walletDbPath =  chainBasePath.resolve("wallets")
+
     val panBaseProject = Paths.get(System.getProperty("user.home"),"pantheon" );
     val bootNodeKeyPath = Paths.get(System.getProperty("user.home"),"chains/private/node1/cdata" );
     val bootNodeKeyPubPath = "publicKey"
