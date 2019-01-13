@@ -18,6 +18,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     compile gradleApi()
+    compile(project(":pantheon"))
     compile(project(":crypto"))
 
 

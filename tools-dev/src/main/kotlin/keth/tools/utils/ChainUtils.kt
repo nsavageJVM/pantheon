@@ -1,5 +1,7 @@
 package keth.tools.utils
 
+import keth.tools.Constants
+import keth.tools.KeyUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
@@ -14,9 +16,10 @@ import java.nio.file.Paths
 
 abstract class  ProjectConnector {
 
-    val panBaseProject = Paths.get(System.getProperty("user.home"),"pantheon" );
+
     val distTarPath =  Paths.get(System.getProperty("user.home"),"chains/private/pantheon-0.8.4-SNAPSHOT" );
-    val baseProject = Paths.get(panBaseProject.toString(), "tools-dev")
+    val baseProject = Constants.panBaseProject.resolve("tools-dev")
+
     lateinit var connection : ProjectConnection
     lateinit var build: BuildLauncher
 
@@ -38,7 +41,7 @@ object InitChain : ProjectConnector() {
         super.getConnector(baseProject);
         try {
             build.forTasks("initDirs" );
-            print("initDirs with project path "+Paths.get(panBaseProject.toString(), "tools-dev"))
+            print("initDirs with project path "+Paths.get(Constants.panBaseProject.toString(), "tools-dev"))
             build.run();
         }
         catch (e: Exception) {
@@ -52,7 +55,7 @@ object InitChain : ProjectConnector() {
 
 
     fun buildDistribution() {
-        super.getConnector(panBaseProject);
+        super.getConnector(Constants.panBaseProject);
         try {
             build.forTasks("clean", "build" );
             build.addArguments("-x", "test")
@@ -69,7 +72,7 @@ object InitChain : ProjectConnector() {
 
     fun copyDistribution() {
 
-        super.getConnector(panBaseProject);
+        super.getConnector(Constants.panBaseProject);
         try {
             build.forTasks("copyDistribution", "unpackDistribution");
             build.run();
@@ -92,43 +95,23 @@ object InitChain : ProjectConnector() {
 }
 
 
-object KeyUtils {
-    val bootNodeKeyPrivatePath = Paths.get(System.getProperty("user.home"),"chains/private/node1/cdata/key" );
-    val bootNodeKeyPubPath = Paths.get(System.getProperty("user.home"),"chains/private/node1/cdata/publicKey" );
-
-    fun generateKeysForBootNode() {
-        val key  = SECP256K1.KeyPair.generate();
-        var f = bootNodeKeyPrivatePath.toFile()
-
-        if(!f.exists()){
-            f.createNewFile();
-        }
-        key.privateKey.store(f)
-
-        var g = bootNodeKeyPubPath.toFile()
-
-        if(!g.exists()){
-            g.createNewFile();
-        }
-
-        try {
-            Files.newBufferedWriter(g.toPath(), UTF_8)
-                    .use({ fileWriter -> fileWriter.write(key.getPublicKey().toString()) })
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-}
-
-
-
 fun main(args : Array<String>) {
     InitChain.initDirs()
     InitChain.buildDistribution()
     InitChain.copyDistribution()
     InitChain.initBinDir()
-    InitChain.initBinDir()
     KeyUtils.generateKeysForBootNode()
+
+    var scriptPath =  Constants.bootNodePath.resolve("run_boot_node.sh")
+
+    BashProvider.writeScript(scriptPath, TYPE.BOOT)
+
+    scriptPath =  Constants.bootNode2.resolve("run_node_2.sh")
+
+    BashProvider.writeScript(scriptPath, TYPE.NODE2)
+
+    scriptPath =  Constants.bootNode3.resolve("run_node_3.sh")
+
+    BashProvider.writeScript(scriptPath, TYPE.NODE3)
 
 }
