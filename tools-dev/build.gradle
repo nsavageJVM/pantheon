@@ -20,6 +20,7 @@ dependencies {
     compile gradleApi()
     compile(project(":pantheon"))
     compile(project(":crypto"))
+    compile(project(":ethereum:p2p"))
 
     implementation 'org.web3j:abi'
     implementation 'org.web3j:core'

@@ -1,44 +1,80 @@
 package keth.tools.account
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.web3j.crypto.ECKeyPair
+import keth.tools.Constants
+import keth.tools.db.DbManager
+import org.bouncycastle.crypto.StreamCipher
 import org.web3j.crypto.Keys
 import org.web3j.crypto.Wallet
 import tech.pegasys.pantheon.crypto.SECP256K1
-import java.math.BigInteger
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESEncryptionEngine
+import tech.pegasys.pantheon.util.bytes.BytesValue
+
 
 
 abstract class WalletBase {
-
-    fun getNewKeyAsWeb3Key():ECKeyPair {
-        val key = SECP256K1.KeyPair.generate();
-        val priKeyAsBigInt : BigInteger = key.privateKey.d
-        val pubKeyAsBigInt = BigInteger(key.publicKey.toString().substring(2), 16)
-
-        return ECKeyPair(priKeyAsBigInt, pubKeyAsBigInt)
+    val key = Keys.createEcKeyPair();
+    val keyPair = SECP256K1.KeyPair.generate()
+    var  engine: ECIESEncryptionEngine
+    init{
+        DbManager.createWalletSore(Constants.walletDbPath)
+        engine = ECIESEncryptionEngine.forEncryption(keyPair.publicKey);
     }
-
 
 
 }
 
 object WalletProvider : WalletBase() {
 
-    fun createRocksDbWallet(menomic:String) {
+    fun createJsonWallet(menomic:String):String {
 
-        val walletFile =  Wallet.createStandard(menomic, getNewKeyAsWeb3Key())
+        val walletFile =  Wallet.createStandard(menomic, key)
 
         val objectMapper =  jacksonObjectMapper()
 
-        val jsonStr =  objectMapper.writeValueAsString(walletFile)
-        println(jsonStr)
+        return  objectMapper.writeValueAsString(walletFile)
 
     }
-}
 
+
+    fun getRocksDbWallet(menomic: String) {
+
+      val result =  DbManager.doGet(menomic)
+        println(result)
+
+    }
+
+    fun createEncryptedRocksDbWallet(menomic:String) {
+
+     val rawData = createJsonWallet(menomic)
+     val eVal: BytesValue = engine.encrypt( BytesValue.wrap(rawData.toByteArray(Charsets.UTF_8)))
+     DbManager.doPutBytes("test", eVal)
+
+    }
+
+
+    fun getEncryptedRocksDbWallet(menomic:String) {
+
+        val eValResult: BytesValue =  DbManager.getBytes(menomic)
+        println(String(eValResult.extractArray(), Charsets.UTF_8))
+
+
+    }
+
+
+
+
+
+}
 
 fun main(args : Array<String>) {
 
-    WalletProvider.createRocksDbWallet("this is pop")
+
+    WalletProvider.createEncryptedRocksDbWallet("this is pop")
+
+    WalletProvider.getRocksDbWallet(("this is pop"))
+
+
+
 
 }
