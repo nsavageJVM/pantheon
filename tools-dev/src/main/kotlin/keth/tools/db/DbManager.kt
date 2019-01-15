@@ -48,7 +48,7 @@ abstract class DbManagerBase {
 
 object  DbManager: DbManagerBase(){
 
-  fun createWalletSore(storageDirectory: Path) {
+  fun createWalletStore(storageDirectory: Path) {
 
       options = Options().setCreateIfMissing(true)
       db = RocksDB.open(options,  storageDirectory.toString())

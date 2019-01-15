@@ -11,6 +11,7 @@ import java.nio.file.Paths
 object Constants {
 
     val chainBasePath = Paths.get(System.getProperty("user.home"),"chains/private")
+    val secureDbPath =  chainBasePath.resolve(".secure")
 
     val walletDbPath =  chainBasePath.resolve("wallets")
 

@@ -3,7 +3,6 @@ package keth.tools.account
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.Constants
 import keth.tools.db.DbManager
-import org.bouncycastle.crypto.StreamCipher
 import org.web3j.crypto.Keys
 import org.web3j.crypto.Wallet
 import tech.pegasys.pantheon.crypto.SECP256K1
@@ -17,7 +16,7 @@ abstract class WalletBase {
     val keyPair = SECP256K1.KeyPair.generate()
     var  engine: ECIESEncryptionEngine
     init{
-        DbManager.createWalletSore(Constants.walletDbPath)
+        DbManager.createWalletStore(Constants.walletDbPath)
         engine = ECIESEncryptionEngine.forEncryption(keyPair.publicKey);
     }
 
