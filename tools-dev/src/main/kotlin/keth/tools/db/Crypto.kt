@@ -98,7 +98,7 @@ object DbCrypto : CryptoBase() {
         val hmacKey = generator.generateSecret(PBEKeySpec(password, salt, 1024, 256));
         return SecretKeySpec(hmacKey.getEncoded(), "AES");
     }
-    
+
     fun persistKeyStore(storePass: CharArray, keyPass: CharArray, secretKey: SecretKey) {
 
         val keyStore = KeyStore.getInstance("BKS", "BC");
@@ -109,7 +109,6 @@ object DbCrypto : CryptoBase() {
         Constants.secureDbPath.toFile().mkdirs()
 
         var fileStore = FileOutputStream(Constants.keySstorePath.toFile())
-        var bOut = ByteArrayOutputStream()
         keyStore.store(fileStore, storePass);
         fileStore.flush();
 

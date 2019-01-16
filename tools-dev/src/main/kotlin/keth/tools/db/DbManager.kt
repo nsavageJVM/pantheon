@@ -1,5 +1,6 @@
 package keth.tools.db
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.Constants
 import org.rocksdb.Options
 import org.rocksdb.RocksDB
@@ -9,6 +10,7 @@ import org.web3j.crypto.ECKeyPair
 import tech.pegasys.pantheon.crypto.SECP256K1
 import tech.pegasys.pantheon.util.bytes.BytesValue
 import java.math.BigInteger
+import java.nio.charset.Charset
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -66,9 +68,6 @@ object  DbManager: DbManagerBase(){
 
     }
 
-
-
-
     fun doGet(key: String):String {
 
         val value = db.get(key.toByteArray(Charsets.UTF_8))
@@ -85,6 +84,30 @@ object  DbManager: DbManagerBase(){
 }
 
 
+fun main(args: Array<String>) {
 
+
+    val keyPass = charArrayOf('T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'p', 'o', 'p')
+    val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
+
+    DbManager.createWalletStore(Constants.walletDbPath)
+
+    // create java keystore for database crypto security
+    DbCrypto.persistKeyStore(strPass, keyPass, DbCrypto.genDbEncryptionKey(keyPass))
+    val key = DbCrypto.getDbEncryptionKey(strPass, keyPass)
+    val data =  "the text to persist".toByteArray()
+    val cryptoResult = DbCrypto.doFinalEncrypt(key, BytesValue.wrap(data))
+    val objectMapper =  jacksonObjectMapper()
+    DbManager.doPutStrings("test", objectMapper.writeValueAsString(cryptoResult) )
+
+    val cipherResult = objectMapper.readValue(DbManager.doGet("test" ), CipherWithParams::class.java )
+
+    println(cipherResult)
+
+   val result =  DbCrypto.doFinalDeCrypt(key, cipherResult)
+
+    println(String(result.extractArray(), Charsets.UTF_8 ))
+
+}
 
 
