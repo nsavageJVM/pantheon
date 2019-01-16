@@ -12,6 +12,7 @@ object Constants {
 
     val chainBasePath = Paths.get(System.getProperty("user.home"),"chains/private")
     val secureDbPath =  chainBasePath.resolve(".secure")
+    val keySstorePath =  secureDbPath.resolve("key_str.jks")
 
     val walletDbPath =  chainBasePath.resolve("wallets")
 
