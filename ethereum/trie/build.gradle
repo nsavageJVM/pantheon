@@ -20,7 +20,7 @@ jar {
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
+    //  'Implementation-Version': calculateVersion()
       )
   }
 }
@@ -33,22 +33,7 @@ dependencies {
   implementation 'com.google.guava:guava'
   implementation 'org.bouncycastle:bcprov-jdk15on'
 
-  testImplementation project(path: ':ethereum:referencetests', configuration: 'testOutput')
-  testImplementation project(':testutil')
-
-  testImplementation 'com.fasterxml.jackson.core:jackson-databind'
-  testImplementation 'junit:junit'
-  testImplementation 'org.assertj:assertj-core'
-  testImplementation 'org.mockito:mockito-core'
 }
 
-test { exclude 'tech/pegasys/pantheon/ethereum/trie/TrieRefTest.class' }
 
-task referenceTests(type: Test, dependsOn: ['compileTestJava']) {
-  doFirst {
-    if (!file("../referencetests/src/test/resources/README.md").exists()) {
-      throw new GradleException("ethereum/referencetests/src/test/resources/README.md missing: please clone submodules (git submodule update --init --recursive)")
-    }
-  }
-  include 'tech/pegasys/pantheon/ethereum/trie/TrieRefTest.class'
-}
+

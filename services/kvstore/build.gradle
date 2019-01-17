@@ -20,7 +20,7 @@ jar {
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
+      //'Implementation-Version': calculateVersion()
       )
   }
 }
@@ -35,5 +35,4 @@ dependencies {
 
   runtime 'org.apache.logging.log4j:log4j-core'
 
-  testImplementation 'junit:junit'
 }

@@ -20,7 +20,7 @@ jar {
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
+      //'Implementation-Version': calculateVersion()
       )
   }
 }
@@ -38,19 +38,5 @@ dependencies {
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
   implementation 'io.vertx:vertx-web'
-
-  testImplementation project(':config')
-  testImplementation project(path: ':config', configuration: 'testSupportArtifacts')
-  testImplementation project(path: ':ethereum:core', configuration: 'testArtifacts')
-  testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
-  testImplementation project(':services:kvstore')
-  testImplementation project(':testutil')
-
-  testImplementation 'com.squareup.okhttp3:okhttp'
-  testImplementation 'junit:junit'
-  testImplementation 'org.assertj:assertj-core'
-  testImplementation 'org.mockito:mockito-core'
-  testImplementation 'io.vertx:vertx-codegen'
-  testImplementation 'io.vertx:vertx-unit'
  
 }

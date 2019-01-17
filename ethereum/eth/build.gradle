@@ -36,15 +36,4 @@ dependencies {
   implementation 'io.vertx:vertx-core'
   implementation 'com.google.guava:guava'
 
-  testImplementation project(':config')
-  testImplementation project(':crypto')
-  testImplementation project(path: ':ethereum:core', configuration: 'testArtifacts')
-  testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
-  testImplementation project(':ethereum:mock-p2p')
-  testImplementation project(':testutil')
-
-  testImplementation 'junit:junit'
-  testImplementation 'org.assertj:assertj-core'
-  testImplementation 'org.awaitility:awaitility'
-  testImplementation 'org.mockito:mockito-core'
 }

@@ -7,7 +7,7 @@ jar {
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
+    //  'Implementation-Version': calculateVersion()
       )
   }
 }
@@ -23,12 +23,4 @@ dependencies {
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
 
-  testImplementation project(path: ':config', configuration: 'testSupportArtifacts')
-  testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
-  testImplementation project(path: ':ethereum:core', configuration: 'testArtifacts')
-
-  testImplementation 'junit:junit'
-  testImplementation 'org.assertj:assertj-core'
-  testImplementation 'org.awaitility:awaitility'
-  testImplementation 'org.mockito:mockito-core'
 }

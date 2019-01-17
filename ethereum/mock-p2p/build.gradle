@@ -20,7 +20,7 @@ jar {
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
+  //    'Implementation-Version': calculateVersion()
       )
   }
 }

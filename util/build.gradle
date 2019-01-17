@@ -20,7 +20,7 @@ jar {
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
+     // 'Implementation-Version': calculateVersion()
       )
   }
 }
@@ -28,8 +28,5 @@ jar {
 dependencies {
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
-
-  testImplementation 'junit:junit'
-  testImplementation 'org.assertj:assertj-core'
-  testImplementation 'org.mockito:mockito-core'
+ 
 }

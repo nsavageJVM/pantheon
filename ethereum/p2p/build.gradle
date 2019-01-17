@@ -20,7 +20,7 @@ jar {
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
-      'Implementation-Version': calculateVersion()
+//      'Implementation-Version': calculateVersion()
       )
   }
 }
@@ -40,18 +40,4 @@ dependencies {
 
   runtime 'org.apache.logging.log4j:log4j-core'
 
-  // test dependencies.
-  testImplementation project(path: ':ethereum:core', configuration: 'testArtifacts')
-  testImplementation project(':testutil')
-
-  testImplementation('io.pkts:pkts-core') {
-    exclude group: 'io.pkts', module: 'pkts-sdp'
-    exclude group: 'io.pkts', module: 'pkts-sip'
-  }
-  testImplementation 'io.vertx:vertx-unit'
-  testImplementation 'io.vertx:vertx-codegen'
-  testImplementation 'junit:junit'
-  testImplementation 'org.assertj:assertj-core'
-  testImplementation 'org.awaitility:awaitility'
-  testImplementation 'org.mockito:mockito-core'
 }

@@ -56,7 +56,6 @@ object WalletProvider : WalletBase() {
 fun main(args: Array<String>) {
 
     WalletProvider.createEncryptedRocksDbWallet("this is pop2")
-
     WalletProvider.getRocksDbWallet("this is pop2")
 
 }
