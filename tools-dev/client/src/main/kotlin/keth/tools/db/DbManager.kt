@@ -83,6 +83,17 @@ object  DbManager: DbManagerBase(){
 
 }
 
+fun bootStrapDbArtifacts()   {
+
+    val keyPass = charArrayOf('T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'p', 'o', 'p')
+    val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
+    DbManager.createWalletStore(Constants.walletDbPath)
+    DbCrypto.persistKeyStore(strPass, keyPass, DbCrypto.genDbEncryptionKey(keyPass))
+
+}
+
+
+
 
 fun main(args: Array<String>) {
 

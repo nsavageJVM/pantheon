@@ -18,6 +18,7 @@ abstract class  ProjectConnector {
 
 
     val distTarPath =  Paths.get(System.getProperty("user.home"),"chains/private/pantheon-0.8.4-SNAPSHOT" );
+    val distCliTarPath =  Paths.get(System.getProperty("user.home"),"chains/private/client-0.8.4-SNAPSHOT" );
     val baseProject = Constants.panBaseProject.resolve("tools-dev")
 
     lateinit var connection : ProjectConnection
@@ -91,11 +92,15 @@ object InitChain : ProjectConnector() {
         val dir = distTarPath.toFile()
         val newDir = File(dir.getParent() + File.separator + "peg")
         dir.renameTo(newDir)
+
+        val cliDir = distCliTarPath.toFile()
+        val newCliDir = File(cliDir.getParent() + File.separator + "cli")
+        cliDir.renameTo(newCliDir)
     }
 }
 
 
-fun main(args : Array<String>) {
+fun bootStrapChainArtifacts()   {
     InitChain.initDirs()
     InitChain.buildDistribution()
     InitChain.copyDistribution()

@@ -32,6 +32,7 @@ include 'metrics'
 include 'pantheon'
 include 'services:kvstore'
 include 'util'
-include 'tools-dev'
+include 'tools-dev:client'
+include 'tools-dev:init-chain'
 
 

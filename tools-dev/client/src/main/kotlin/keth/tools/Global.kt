@@ -1,8 +1,8 @@
 package keth.tools
 
-import tech.pegasys.pantheon.controller.KeyPairUtil
 import tech.pegasys.pantheon.crypto.SECP256K1
 import java.io.IOException
+import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -25,6 +25,12 @@ object Constants {
     val bootNode3 = chainBasePath.resolve("node3")
 
     val genesisPath = chainBasePath.resolve("prichainGenesis.json")
+
+
+    //== ws EVENTBUS topics
+
+   val REMOVE_SUBSCRIPTIONS_ADDRESS = "removeSubscription";
+
 
 
 }
@@ -57,10 +63,40 @@ object KeyUtils {
         }
     }
 
-
     fun loadKeyFile(path: Path): SECP256K1.KeyPair {
 
-      return  KeyPairUtil.loadKeyPair(Constants.bootNodeKeyPath)
+      return  loadKeyPair(Constants.bootNodeKeyPath)
+    }
 
+    @Throws(IOException::class)
+    fun loadKeyPair(homeDirectory: Path): SECP256K1.KeyPair {
+       val keyFile =   homeDirectory.resolve("key").toFile()
+        return SECP256K1.KeyPair.load(keyFile)
     }
 }
+
+
+object ResourceUtils {
+
+  fun getResource(name: String ) : URL {
+
+
+        var url = Thread.currentThread().getContextClassLoader().getResource(name);
+
+        if (url == null) {
+            url = ResourceUtils::class.java.getResource(name);
+         }
+        if (url == null) {
+            url = ResourceUtils::class.java.getClassLoader().getResource(name);
+        }
+
+        if (url == null) {
+            url = ClassLoader.getSystemResource(name);
+        }
+
+        return url;
+    }
+}
+
+
+

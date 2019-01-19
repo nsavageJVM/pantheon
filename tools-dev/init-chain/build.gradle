@@ -1,0 +1,57 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.11"
+    }
+}
+
+apply plugin: "org.jetbrains.kotlin.jvm"
+apply plugin: 'java-library'
+apply plugin:'application'
+
+mainClassName = 'keth.tools.SetUpChainArtifactsKt'
+
+def base =System.getProperty("user.home")
+
+group 'tech.pegasys.pantheon'
+version '0.8.4-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    
+    implementation project(':tools-dev:client')
+ 
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+
+jar {
+    baseName 'InitChain'
+    manifest {
+        attributes(
+                'Specification-Title': baseName,
+                'Specification-Version': project.version,
+                'Implementation-Title': baseName,
+                 'Main-Class': 'keth.tools.InitChain'
+        )
+    }
+}
+
+ 
+

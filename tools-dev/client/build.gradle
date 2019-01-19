@@ -1,0 +1,121 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.11"
+    }
+}
+
+apply plugin: "org.jetbrains.kotlin.jvm"
+apply plugin: 'java-library'
+apply plugin:'application'
+
+mainClassName = 'keth.tools.ClientKt'
+
+def base =System.getProperty("user.home")
+
+group 'tech.pegasys.pantheon'
+version '0.8.4-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    implementation gradleApi()
+
+    implementation(project(":crypto"))
+    implementation(project(":ethereum:p2p"))
+
+    implementation 'org.web3j:abi'
+    implementation 'org.web3j:core'
+    implementation 'org.web3j:crypto'
+
+    implementation 'org.rocksdb:rocksdbjni'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7'
+    implementation 'io.vertx:vertx-lang-kotlin:3.6.1'
+    implementation 'io.vertx:vertx-lang-kotlin-coroutines:3.6.1'
+    implementation 'io.vertx:vertx-web'
+    
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+
+jar {
+    baseName 'client'
+    manifest {
+        attributes(
+                'Specification-Title': baseName,
+                'Specification-Version': project.version,
+                'Implementation-Title': baseName,
+                 'Main-Class': 'keth.tools.ClientKt'
+        )
+    }
+}
+
+task initDirs {
+
+    doLast {
+        println(" running task initDirs with base:= ${base}")
+        mkdir "${base}/chains/private/node1/cdata"
+        mkdir "${base}/chains/private/node2/cdata"
+        mkdir "${base}/chains/private/node3/cdata"
+    }
+}
+
+task copyDistribution(type: Copy) {
+    println(" running task copyDistribution with source:= ${base}/pantheon/build/distributions")
+    println(" running task copyDistribution with target:= ${base}/chains/private")
+    from "${base}/pantheon/build/distributions"
+    include "**/*.gz"
+    into "${base}/chains/private"
+    // pantheon-0.8.4-SNAPSHOT.tar.gz
+    rename '(.+)-0.8.4-SNAPSHOT(.+)', '$1$2'
+
+    from "src/main/resources"
+    include "**/*.json"
+    into "${base}/chains/private"
+
+    println(" running task copyDistribution with source:= ${base}/pantheon/tools-dev/client/build/distributions")
+    println(" running task copyDistribution with target:= ${base}/chains/private")
+    from "${base}/pantheon/tools-dev/client/build/distributions"
+    include "**/*.tar"
+    into "${base}/chains/private"
+    // pantheon-0.8.4-SNAPSHOT.tar.gz
+    rename '(.+)-0.8.4-SNAPSHOT(.+)', '$1$2'
+}
+ 
+
+
+task unpackDistribution(type: Copy) {
+    println(" running task unpackDistribution with source:= ${base}chains/private/pantheon.tar.gz")
+    println(" running task copyDistribution with target:= ${base}/chains/private")
+    from tarTree("${base}/chains/private/pantheon.tar.gz")
+
+    into "${base}/chains/private"
+
+    println(" running task unpackDistribution with source:= ${base}chains/private/client.tar")
+    println(" running task unpackDistribution with target:= ${base}/chains/private")
+    from tarTree("${base}/chains/private/client.tar")
+
+    into "${base}/chains/private"
+    
+}
+ 
+
+ 
+
