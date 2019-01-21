@@ -5,11 +5,26 @@ import keth.tools.Constants
 import keth.tools.db.CipherWithParams
 import keth.tools.db.DbCrypto
 import keth.tools.db.DbManager
+import org.web3j.crypto.ECKeyPair
 import org.web3j.crypto.Keys
 import org.web3j.crypto.Wallet
+import org.web3j.crypto.WalletFile
 import tech.pegasys.pantheon.crypto.SECP256K1
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESEncryptionEngine
 import tech.pegasys.pantheon.util.bytes.BytesValue
+
+//"alloc": {
+
+//    "0000000000000000000000000000000000000001": {
+//        "balance": "0xFFFFFFFFFFFFFFF"
+//    },
+//    "0000000000000000000000000000000000000002": {
+//        "balance": "0xFFFFFFFFFFFFFF"
+//    },
+//    "0000000000000000000000000000000000000003": {
+//        "balance": "0xFFFFFFFFFFFFF"
+//    }
+
+
 
 
 abstract class WalletBase {
@@ -19,6 +34,12 @@ abstract class WalletBase {
     val keyPass = charArrayOf('T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'p', 'o', 'p')
     val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
     val objectMapper = jacksonObjectMapper()
+
+    val acct1= "0000000000000000000000000000000000000001"
+    val acct2= "0000000000000000000000000000000000000002"
+    val acct3= "0000000000000000000000000000000000000003"
+
+    val acctCB= "0x7ff4cb4cc4173e2d45a5a4b7fb40876c3c46ba4f"
 
 
     init {
@@ -36,11 +57,17 @@ object WalletProvider : WalletBase() {
         return objectMapper.writeValueAsString(walletFile)
     }
 
-    fun getRocksDbWallet(menomic: String) {
+    fun getRocksDbWallet(menomic: String) :WalletFile {
         val cipherResult = objectMapper.readValue(DbManager.doGet(menomic), CipherWithParams::class.java )
         val key = DbCrypto.getDbEncryptionKey(strPass, keyPass)
         val result =  DbCrypto.doFinalDeCrypt(key, cipherResult)
-        println(String(result.extractArray(), Charsets.UTF_8 ))
+        val walletAsJson = String(result.extractArray(), Charsets.UTF_8 )
+        val wFile =  objectMapper.readValue(walletAsJson, WalletFile::class.java)
+
+        println(" address:${wFile.address}")
+        val ecKeys = Wallet.decrypt(menomic, wFile )
+        return wFile;
+
     }
 
     fun createEncryptedRocksDbWallet(menomic: String) {
@@ -50,6 +77,7 @@ object WalletProvider : WalletBase() {
         val cryptoResult = DbCrypto.doFinalEncrypt(key, BytesValue.wrap(rawData.toByteArray()))
         DbManager.doPutStrings(menomic, objectMapper.writeValueAsString(cryptoResult) )
     }
+
 
 }
 

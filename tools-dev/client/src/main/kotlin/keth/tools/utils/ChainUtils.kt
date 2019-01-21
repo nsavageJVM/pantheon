@@ -5,11 +5,7 @@ import keth.tools.KeyUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
-import tech.pegasys.pantheon.crypto.SECP256K1
 import java.io.File
-import java.io.IOException
-import java.nio.charset.StandardCharsets.UTF_8
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -87,6 +83,23 @@ object InitChain : ProjectConnector() {
 
     }
 
+
+    fun copyGenesis() {
+
+        super.getConnector(Constants.panBaseProject);
+        try {
+            build.forTasks("copyGenesis");
+            build.run();
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
+        finally {
+            connection.close();
+        }
+    }
+
+
     fun initBinDir( ){
 
         val dir = distTarPath.toFile()
@@ -105,17 +118,19 @@ fun bootStrapChainArtifacts()   {
     InitChain.buildDistribution()
     InitChain.copyDistribution()
     InitChain.initBinDir()
-    KeyUtils.generateKeysForBootNode()
+    val addrs:Triple<String,String,String> = KeyUtils.generateKeysForNodes()
+    GenesisProvider.updateGenesisExtraData(addrs)
+    InitChain.copyGenesis()
 
-    var scriptPath =  Constants.bootNodePath.resolve("run_boot_node.sh")
+    var scriptPath =  Constants.bootNodeScriptPath.resolve("run_boot_node.sh")
 
     BashProvider.writeScript(scriptPath, TYPE.BOOT)
 
-    scriptPath =  Constants.bootNode2.resolve("run_node_2.sh")
+    scriptPath =  Constants.node2ScriptPath.resolve("run_node_2.sh")
 
     BashProvider.writeScript(scriptPath, TYPE.NODE2)
 
-    scriptPath =  Constants.bootNode3.resolve("run_node_3.sh")
+    scriptPath =  Constants.node3ScriptPath.resolve("run_node_3.sh")
 
     BashProvider.writeScript(scriptPath, TYPE.NODE3)
 

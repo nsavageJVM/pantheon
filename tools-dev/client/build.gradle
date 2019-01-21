@@ -1,17 +1,22 @@
+
 buildscript {
     repositories {
+
         maven {
             url "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.11"
+        classpath files("lib/solidity-gradle-plugin-0.1.2.jar")
+
     }
 }
 
 apply plugin: "org.jetbrains.kotlin.jvm"
 apply plugin: 'java-library'
 apply plugin:'application'
+apply plugin: org.web3j.solidity.gradle.plugin.SolidityPlugin
 
 mainClassName = 'keth.tools.ClientKt'
 
@@ -33,16 +38,19 @@ dependencies {
 
     implementation(project(":crypto"))
     implementation(project(":ethereum:p2p"))
-
+ 
     implementation 'org.web3j:abi'
     implementation 'org.web3j:core'
     implementation 'org.web3j:crypto'
+    implementation 'org.web3j:codegen:4.0.1'
+
 
     implementation 'org.rocksdb:rocksdbjni'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7'
     implementation 'io.vertx:vertx-lang-kotlin:3.6.1'
     implementation 'io.vertx:vertx-lang-kotlin-coroutines:3.6.1'
     implementation 'io.vertx:vertx-web'
+    implementation 'io.vertx:vertx-web-client:3.5.4'
     
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
@@ -98,7 +106,20 @@ task copyDistribution(type: Copy) {
     // pantheon-0.8.4-SNAPSHOT.tar.gz
     rename '(.+)-0.8.4-SNAPSHOT(.+)', '$1$2'
 }
- 
+
+
+task copyGenesis(type: Copy) {
+    
+    from "src/main/resources"
+    include "**/*.json"
+    into "${base}/chains/private"
+}
+
+
+
+
+
+
 
 
 task unpackDistribution(type: Copy) {

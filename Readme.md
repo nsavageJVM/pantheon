@@ -37,9 +37,13 @@ if you manage to get this to run on your box then shoud see something on your bo
 run the scripts and you should get a chain composed of a boot node with 2 peers running with clique
 ```
 // in chains/private/node1
+cd  chains/private/node1
 sh run_boot_node.sh
 // in  chains/private/nodeN
-sh run_node_N.sh
+cd  chains/private/node2
+sh run_node_2.sh
+cd  chains/private/node3
+sh run_node_3.sh
 // test
 curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' 127.0.0.1:8545
 ```
