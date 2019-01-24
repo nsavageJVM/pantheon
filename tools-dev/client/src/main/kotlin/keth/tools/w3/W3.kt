@@ -26,13 +26,10 @@ abstract class W3Base: io.vertx.core.AbstractVerticle()  {
     val objectMapper = jacksonObjectMapper()
 
     override fun start() {
-
         client = WebClient.create(vertx)
-
     }
 
     abstract  fun getAccount()
-
 
 
     // == API
@@ -51,9 +48,6 @@ abstract class W3Base: io.vertx.core.AbstractVerticle()  {
         node.put("jsonrpc", "2.0").put("id", id_)
         return node;
     }
-
-
-
 
 }
 
@@ -85,6 +79,5 @@ class W3Client: W3Base() {
             w3Client.getAccount()
         }
         else { println(it.cause().localizedMessage)}   }
-
 
  }

@@ -42,20 +42,12 @@ abstract class ContractBase {
 
     var chainCredentials:Credentials? = null
 
-    var addr:String? = null
-
     fun createWeb3Credentials() {
         val priKeyBytes =  keyPair.privateKey.encodedBytes
 
         val pairForCredentials =   ECKeyPair.create(priKeyBytes.extractArray())
         chainCredentials = Credentials.create(pairForCredentials)
-
-        addr =  chainCredentials!!.address
-
-        println(addr)
-
     }
-
 
     fun generateWrapper() {
         var binBytes = Files.readBytes(Generator.binFile)
@@ -107,8 +99,6 @@ object Generator : ContractBase() {
         println("contractAddress = ${contractAddress}")
 
     }
-
-
 
 }
 

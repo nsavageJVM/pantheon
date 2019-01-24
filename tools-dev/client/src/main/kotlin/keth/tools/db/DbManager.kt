@@ -13,112 +13,152 @@ import java.math.BigInteger
 import java.nio.charset.Charset
 import java.nio.file.Path
 import java.nio.file.Paths
+import org.rocksdb.RocksIterator
+import javax.crypto.SecretKey
+
 
 abstract class DbManagerBase {
 
-    lateinit var  db : RocksDB
-    lateinit var  options: Options
-    lateinit var  txOptions: TransactionDBOptions
+    var db: RocksDB? = null
+    lateinit var options: Options
+    val objectMapper = jacksonObjectMapper()
+    var key: SecretKey? = null
+    // to be user input in gui
+    val keyPass = charArrayOf('T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'p', 'o', 'p')
+    val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
 
     init {
         RocksDB.loadLibrary();
+
     }
-
-    /**
-     * how to do this ?
-     *
-     * to reuse Pantheon cryto code with web3j need a map between the key format
-     *
-     */
-    fun getNewKeyAsWeb3Key(): ECKeyPair {
-        val key = SECP256K1.KeyPair.generate();
-        val priKeyAsBigInt : BigInteger = key.privateKey.d
-        val pubKeyAsBigInt = BigInteger(key.publicKey.toString().substring(2), 16)
-
-        return ECKeyPair(priKeyAsBigInt, pubKeyAsBigInt)
-    }
-
-
-    fun getKeyAsPanKey(web3Key : ECKeyPair): SECP256K1.KeyPair {
-        val key = SECP256K1.KeyPair(SECP256K1.PrivateKey.create(web3Key.privateKey), SECP256K1.PublicKey.create(web3Key.publicKey))
-        return key
-    }
-
-
 }
 
 
-object  DbManager: DbManagerBase(){
+object DbManager : DbManagerBase() {
 
-  fun createWalletStore(storageDirectory: Path) {
+    fun initDb() {
 
-      options = Options().setCreateIfMissing(true)
-      db = RocksDB.open(options,  storageDirectory.toString())
+        options = Options().setCreateIfMissing(true)
+        if (db == null) {
+            db = RocksDB.open(options, Constants.walletDbPath.toString())
+        }
 
-  }
+    }
 
+
+    fun initKeyStoreForDb() {
+
+        DbCrypto.persistKeyStore(strPass, keyPass, DbCrypto.genDbEncryptionKey(keyPass))
+    }
 
     fun doPutStrings(key: String, value: String) {
-         db.put(key.toByteArray(Charsets.UTF_8), value.toByteArray(Charsets.UTF_8));
+        db!!.put(key.toByteArray(Charsets.UTF_8), value.toByteArray(Charsets.UTF_8));
 
     }
 
-    fun doPutBytes(key: String, value: BytesValue) {
-        db.put(key.toByteArray(Charsets.UTF_8),  value.extractArray( ));
+//    fun doPutBytes(key: String, value: BytesValue) {
+//        db!!.put(key.toByteArray(Charsets.UTF_8),  value.extractArray( ));
+//
+//    }
 
+    fun printKeys() {
+        val iter = db!!.newIterator()
+        iter.seekToFirst();
+
+        while (iter.isValid) {
+            val key = String(iter.key(), Charsets.UTF_8)
+            val `val` = String(iter.value(), Charsets.UTF_8)
+            println("$key -> $`val`")
+            iter.next()
+        }
     }
 
-    fun doGet(key: String):String {
+    fun doGet(key: String): String {
 
-        val value = db.get(key.toByteArray(Charsets.UTF_8))
-        return String (value, Charsets.UTF_8)
+        val value = db!!.get(key.toByteArray(Charsets.UTF_8))
+        return String(value, Charsets.UTF_8)
     }
 
-    fun getBytes(key: String): BytesValue {
+    fun getAccounts(): Triple<String, String, String> {
+        if (key == null) {
+            key = DbCrypto.getDbEncryptionKey(strPass, keyPass)
+        }
+        val addr1 = getAccount("acct0")
+        val addr2 = getAccount("acct1")
+        val addr3 = getAccount("acct2")
 
-       return BytesValue.wrap(db.get(key.toByteArray(Charsets.UTF_8)))
+        return Triple(addr1, addr2, addr3)
+    }
 
+    private fun getAccount(key: String): String {
+        val cr = objectMapper.readValue(doGet(key), CipherWithParams::class.java)
+        return String(DbCrypto.doFinalDeCrypt(DbManager.key!!, cr).extractArray(), Charsets.UTF_8)
     }
 
 
 }
 
-fun bootStrapDbArtifacts()   {
+fun bootStrapDbArtifacts(addresses: Triple<String, String, String>) {
 
     val keyPass = charArrayOf('T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'p', 'o', 'p')
     val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
-    DbManager.createWalletStore(Constants.walletDbPath)
-    DbCrypto.persistKeyStore(strPass, keyPass, DbCrypto.genDbEncryptionKey(keyPass))
+    DbManager.initDb()
+    DbManager.initKeyStoreForDb()
 
+    val key = DbCrypto.getDbEncryptionKey(strPass, keyPass)
+
+    // in db values are encrypted in the CipherWithParams data class with ::doFinalEncrypt
+    addresses.toList().forEachIndexed {
+
+        i, e ->
+
+        DbManager.doPutStrings("acct${i}", DbManager.objectMapper.writeValueAsString(
+                DbCrypto.doFinalEncrypt(key, BytesValue.wrap(e.toByteArray()))))
+
+    }
 }
-
-
 
 
 fun main(args: Array<String>) {
+    DbManager.initDb()
+    println(DbManager.getAccounts())
 
 
-    val keyPass = charArrayOf('T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'p', 'o', 'p')
-    val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
-
-    DbManager.createWalletStore(Constants.walletDbPath)
-
-    // create java keystore for database crypto security
-    DbCrypto.persistKeyStore(strPass, keyPass, DbCrypto.genDbEncryptionKey(keyPass))
-    val key = DbCrypto.getDbEncryptionKey(strPass, keyPass)
-    val data =  "the text to persist".toByteArray()
-    val cryptoResult = DbCrypto.doFinalEncrypt(key, BytesValue.wrap(data))
-    val objectMapper =  jacksonObjectMapper()
-    DbManager.doPutStrings("test", objectMapper.writeValueAsString(cryptoResult) )
-
-    val cipherResult = objectMapper.readValue(DbManager.doGet("test" ), CipherWithParams::class.java )
-
-    println(cipherResult)
-
-   val result =  DbCrypto.doFinalDeCrypt(key, cipherResult)
-
-    println(String(result.extractArray(), Charsets.UTF_8 ))
+//    val keyPass = charArrayOf('T', 'h', 'i', 's', ' ', 'i', 's', ' ', 'p', 'o', 'p')
+//    val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
+//    DbManager.initDb()
+//
+////    DbManager. printKeys()
+//
+//    val encrypted_account = DbManager.doGet("acct0")
+//    println("encrypted_account " + encrypted_account)
+//
+//    val key = DbCrypto.getDbEncryptionKey(strPass, keyPass)
+//    val cipherResult = DbManager.objectMapper.readValue(encrypted_account, CipherWithParams::class.java)
+//    val result = DbCrypto.doFinalDeCrypt(key, cipherResult)
+//    println("raw bytes " + result)
+//    println("addr " + String(result.extractArray(), Charsets.UTF_8))
 
 }
+
+//    DbManager.createWalletStore(Constants.walletDbPath)
+//
+//    // create java keystore for database crypto security
+//    DbCrypto.persistKeyStore(strPass, keyPass, DbCrypto.genDbEncryptionKey(keyPass))
+//    val key = DbCrypto.getDbEncryptionKey(strPass, keyPass)
+//    val data =  "the text to persist".toByteArray()
+//    val cryptoResult = DbCrypto.doFinalEncrypt(key, BytesValue.wrap(data))
+//    val objectMapper =  jacksonObjectMapper()
+//    DbManager.doPutStrings("test", objectMapper.writeValueAsString(cryptoResult) )
+//
+//    val cipherResult = objectMapper.readValue(DbManager.doGet("test" ), CipherWithParams::class.java )
+//
+//    println(cipherResult)
+//
+//   val result =  DbCrypto.doFinalDeCrypt(key, cipherResult)
+//
+//    println(String(result.extractArray(), Charsets.UTF_8 ))
+
+
 
 

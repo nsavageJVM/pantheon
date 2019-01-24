@@ -22,7 +22,7 @@ abstract class BashConstants {
     val BOOT_NODE_HOST = "127.0.0.1"
 
     val RUN_BootNode = """
-      |../peg/bin/pantheon --datadir=cdata --genesis=%s --network-id %s --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000 --rpc-enabled --ws-enabled  --host-whitelist=* """
+      |../peg/bin/pantheon --datadir=cdata --genesis=%s --network-id %s --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000 --rpc-enabled --ws-enabled  --host-whitelist=* --rpc-cors-origins=all """
 
     val BOOT_ENODE = "enode://%s@$BOOT_NODE_HOST:%s"
 

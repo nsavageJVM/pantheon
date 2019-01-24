@@ -5,8 +5,8 @@ import keth.tools.utils.bootStrapChainArtifacts
 
 fun main() {
 
-    bootStrapChainArtifacts()
-    bootStrapDbArtifacts()
+    val addrs:Triple<String,String,String> = bootStrapChainArtifacts()
+    bootStrapDbArtifacts(addrs)
 
 
 

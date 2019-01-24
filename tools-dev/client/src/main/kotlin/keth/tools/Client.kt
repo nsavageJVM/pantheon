@@ -30,4 +30,5 @@ class Client : CoroutineVerticle() {
                 .websocketHandler(WsArtifacts.getWebSocketHandler(vertx))
                 .listen()
     }
+
 }

@@ -43,7 +43,7 @@ abstract class WalletBase {
 
 
     init {
-        DbManager.createWalletStore(Constants.walletDbPath)
+        DbManager.initDb( )
         DbCrypto.persistKeyStore(strPass, keyPass, DbCrypto.genDbEncryptionKey(keyPass))
 
     }

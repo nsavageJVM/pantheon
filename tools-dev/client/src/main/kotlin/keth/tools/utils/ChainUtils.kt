@@ -113,7 +113,7 @@ object InitChain : ProjectConnector() {
 }
 
 
-fun bootStrapChainArtifacts()   {
+fun bootStrapChainArtifacts(): Triple<String, String, String>   {
     InitChain.initDirs()
     InitChain.buildDistribution()
     InitChain.copyDistribution()
@@ -133,5 +133,6 @@ fun bootStrapChainArtifacts()   {
     scriptPath =  Constants.node3ScriptPath.resolve("run_node_3.sh")
 
     BashProvider.writeScript(scriptPath, TYPE.NODE3)
-
+    // these r the account addresses
+    return addrs
 }
