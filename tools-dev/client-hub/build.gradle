@@ -82,6 +82,10 @@ bootJar {
 	mainClassName = 'eth.tools.client.RemoteNodeKt'
 }
 
+springBoot {
+	mainClassName = 'eth.tools.client.RemoteNodeKt'
+}
+
 
 
 task copyFrontEndResources(type: Copy) {

@@ -22,7 +22,7 @@ abstract class BashConstants {
     val BOOT_NODE_HOST = "127.0.0.1"
 
     val RUN_BootNode = """
-      |../peg/bin/pantheon --datadir=cdata --genesis=%s --network-id %s  --rpc-enabled=true --ws-enabled=true  --host-whitelist=* --rpc-cors-origins=all """
+      |../peg/bin/pantheon --datadir=cdata --genesis=%s --network-id %s --miner-enabled=true --miner-coinbase=%s  --rpc-enabled=true --ws-enabled=true  --host-whitelist=* --rpc-cors-origins=all """
 
     val BOOT_ENODE = "enode://%s@$BOOT_NODE_HOST:%s"
 
@@ -30,9 +30,9 @@ abstract class BashConstants {
         |../peg/bin/pantheon  --datadir=cdata  --genesis=%s  --miner-enabled=true --miner-coinbase=%s --network-id %s --bootnodes=%s --p2p-listen=127.0.0.1:%s
         """
 
-    protected fun genBootNodeScript(): String {
+    protected fun genBootNodeScript(addr: String): String {
 
-        val script = BashProvider.RUN_BootNode.format(Constants.genesisPath, NET_ID)
+        val script = BashProvider.RUN_BootNode.format(Constants.genesisPath, NET_ID, addr)
         return "${BashProvider.SHEBANG} \n${script.trimMargin()}"
     }
 
@@ -62,7 +62,7 @@ object BashProvider : BashConstants() {
 
         when (type) {
             TYPE.BOOT -> {
-                return genBootNodeScript()
+                return genBootNodeScript(addr)
             }
             TYPE.NODE2 -> {
                 return getNodeScript( addr, type)
