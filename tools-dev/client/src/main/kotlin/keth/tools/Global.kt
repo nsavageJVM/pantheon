@@ -86,28 +86,25 @@ object KeyUtils {
         val nodeKey3ECKeyPair =   ECKeyPair.create( nodeKey3.privateKey.encodedBytes.extractArray())
         val nodeKey3Credentials = Credentials.create(nodeKey3ECKeyPair)
 
-        var g = Constants.bootNodePath.resolve(Constants.bootNodeKeyPubPath).toFile()
-
-        if(!g.exists()){
-            g.createNewFile();
-        }
-
-        try {
-            Files.newBufferedWriter(g.toPath(), StandardCharsets.UTF_8)
-                    .use({ fileWriter -> fileWriter.write(bNodeKey.getPublicKey().toString()) })
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
+//        var g = Constants.bootNodePath.resolve(Constants.bootNodeKeyPubPath).toFile()
+//
+//        if(!g.exists()){
+//            g.createNewFile();
+//        }
+//
+//        try {
+//            Files.newBufferedWriter(g.toPath(), StandardCharsets.UTF_8)
+//                    .use({ fileWriter -> fileWriter.write(bNodeKey.getPublicKey().toString()) })
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//        }
 
         return Triple(bNodeCredentials!!.address, nodeKey2Credentials!!.address, nodeKey3Credentials!!.address )
     }
 
-
-
-
     fun loadKeyFile(path: Path): SECP256K1.KeyPair {
 
-      return  loadKeyPair(Constants.bootNodePath)
+      return  loadKeyPair(path)
     }
 
     @Throws(IOException::class)

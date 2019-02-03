@@ -37,8 +37,8 @@ abstract class ContractBase {
     val objectMapper = jacksonObjectMapper()
 
     val web3j = Web3j.build(HttpService("http://127.0.0.1:8545"));
-
-    val keyPair = KeyUtils.loadKeyFile(Constants.bootNodePath.resolve("key"))
+    // Constants.bootNodePath  looks for file "key" in path
+    val keyPair = KeyUtils.loadKeyFile(Constants.bootNodePath)
 
     var chainCredentials:Credentials? = null
 

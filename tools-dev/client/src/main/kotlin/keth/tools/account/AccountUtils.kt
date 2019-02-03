@@ -12,20 +12,6 @@ import org.web3j.crypto.WalletFile
 import tech.pegasys.pantheon.crypto.SECP256K1
 import tech.pegasys.pantheon.util.bytes.BytesValue
 
-//"alloc": {
-
-//    "0000000000000000000000000000000000000001": {
-//        "balance": "0xFFFFFFFFFFFFFFF"
-//    },
-//    "0000000000000000000000000000000000000002": {
-//        "balance": "0xFFFFFFFFFFFFFF"
-//    },
-//    "0000000000000000000000000000000000000003": {
-//        "balance": "0xFFFFFFFFFFFFF"
-//    }
-
-
-
 
 abstract class WalletBase {
     val keys = Keys.createEcKeyPair();
@@ -35,9 +21,6 @@ abstract class WalletBase {
     val strPass = charArrayOf('y', 'e', 'a', 'h', ' ', 'y', 'e', 'a', 'h')
     val objectMapper = jacksonObjectMapper()
 
-    val acct1= "0000000000000000000000000000000000000001"
-    val acct2= "0000000000000000000000000000000000000002"
-    val acct3= "0000000000000000000000000000000000000003"
 
     val acctCB= "0x7ff4cb4cc4173e2d45a5a4b7fb40876c3c46ba4f"
 

@@ -77,7 +77,7 @@ object BashProvider : BashConstants() {
 
     private fun getNodeScript(addr:String, type: TYPE): String {
 
-        val key = KeyUtils.loadKeyFile(Constants.bootNodePath.resolve(Constants.bootNodeKeyPubPath))
+        val key = KeyUtils.loadKeyFile(Constants.bootNodePath)
         val enode = genEnode(key)
         when (type) {
             TYPE.NODE2 -> {
