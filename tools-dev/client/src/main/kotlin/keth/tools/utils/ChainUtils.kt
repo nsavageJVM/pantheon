@@ -124,15 +124,15 @@ fun bootStrapChainArtifacts(): Triple<String, String, String>   {
 
     var scriptPath =  Constants.bootNodeScriptPath.resolve("run_boot_node.sh")
 
-    BashProvider.writeScript(scriptPath, TYPE.BOOT)
+    BashProvider.writeScript(scriptPath, "",TYPE.BOOT)
 
     scriptPath =  Constants.node2ScriptPath.resolve("run_node_2.sh")
 
-    BashProvider.writeScript(scriptPath, TYPE.NODE2)
+    BashProvider.writeScript(scriptPath,addrs.second, TYPE.NODE2)
 
     scriptPath =  Constants.node3ScriptPath.resolve("run_node_3.sh")
 
-    BashProvider.writeScript(scriptPath, TYPE.NODE3)
+    BashProvider.writeScript(scriptPath, addrs.second, TYPE.NODE3)
     // these r the account addresses
     return addrs
 }

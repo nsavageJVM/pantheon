@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+    <title>Chai(n) Tools</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" rel="stylesheet" type="text/css" >
+</head>
+
+<body>
+<section class="hero is-fullheight is-primary is-bold" >
+    <div class="hero-head content has-text-centered">
+        <h1 class="title is-1">Chai(n) Tools</h1>
+        <h3 class="subtitle is-3">Please Login In</h3>
+    </div>
+
+        <div class="hero-body">
+            <div class="container">
+                <form th:action="@{/tools/login}" method="post">
+
+                        <h1 class="title is-2">Login</h1>
+
+                        <div class="field">
+                        <div class="control">
+                            <input type="text" name="username"  class="input" placeholder="admin"
+                                required="true" autofocus="true" />
+                        </div>
+                        </div>
+
+                        <div class="field">
+                        <div class="control">
+                            <input type="password" name="password"  class="input"   placeholder="admin"
+                                required="true" />
+                        </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="control">
+                                <input type="submit" class="button is-dark is-medium" value="Sign In" />
+                            </div>
+
+                        </div>
+
+                </form>
+        </div>
+    </div>
+    <div class="hero-foot  has-text-centered">
+        <p>Contact nsavagejvm @github.com/nsavageJVM 2019</p>
+    </div>
+</section>
+</body>
+
+</html>

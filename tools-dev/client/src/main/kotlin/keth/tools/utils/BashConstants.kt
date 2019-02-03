@@ -22,12 +22,12 @@ abstract class BashConstants {
     val BOOT_NODE_HOST = "127.0.0.1"
 
     val RUN_BootNode = """
-      |../peg/bin/pantheon --datadir=cdata --genesis=%s --network-id %s --miner-enabled --miner-coinbase=0x0000000000000000000000000000000000000000 --rpc-enabled --ws-enabled  --host-whitelist=* --rpc-cors-origins=all """
+      |../peg/bin/pantheon --datadir=cdata --genesis=%s --network-id %s  --rpc-enabled=true --ws-enabled=true  --host-whitelist=* --rpc-cors-origins=all """
 
     val BOOT_ENODE = "enode://%s@$BOOT_NODE_HOST:%s"
 
     val RUN_Node = """
-        |../peg/bin/pantheon  --datadir=cdata   --genesis=%s --network-id %s --bootnodes=%s --p2p-listen=127.0.0.1:%s
+        |../peg/bin/pantheon  --datadir=cdata  --genesis=%s  --miner-enabled=true --miner-coinbase=%s --network-id %s --bootnodes=%s --p2p-listen=127.0.0.1:%s
         """
 
     protected fun genBootNodeScript(): String {
@@ -47,46 +47,46 @@ enum class TYPE { BOOT, NODE2, NODE3 }
 
 object BashProvider : BashConstants() {
 
-    fun writeScript(path: Path, type: TYPE) {
+    fun writeScript(path: Path, addr:String, type: TYPE) {
 
         try {
             Files.newBufferedWriter(path, StandardCharsets.UTF_8)
-                    .use({ fileWriter -> fileWriter.write(generateNodeScripts(type)) })
+                    .use({ fileWriter -> fileWriter.write(generateNodeScripts(addr, type)) })
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
 
-    private fun generateNodeScripts(type: TYPE): String {
+    private fun generateNodeScripts( addr:String, type: TYPE): String {
 
         when (type) {
             TYPE.BOOT -> {
                 return genBootNodeScript()
             }
             TYPE.NODE2 -> {
-                return getNodeScript(type)
+                return getNodeScript( addr, type)
             }
             TYPE.NODE3 -> {
-                return getNodeScript(type)
+                return getNodeScript( addr, type)
             }
             else -> return "Unknown Type"
         }
     }
 
 
-    private fun getNodeScript(type: TYPE): String {
+    private fun getNodeScript(addr:String, type: TYPE): String {
 
         val key = KeyUtils.loadKeyFile(Constants.bootNodePath.resolve(Constants.bootNodeKeyPubPath))
         val enode = genEnode(key)
         when (type) {
             TYPE.NODE2 -> {
-                val script = RUN_Node.format(Constants.genesisPath, NET_ID, enode, NODE_2_PORT)
+                val script = RUN_Node.format(Constants.genesisPath, addr, NET_ID, enode, NODE_2_PORT)
                 return "$SHEBANG \n${script.trimMargin()}"
 
             }
             TYPE.NODE3 -> {
-                val script = RUN_Node.format(Constants.genesisPath, NET_ID, enode, NODE_3_PORT)
+                val script = RUN_Node.format(Constants.genesisPath, addr, NET_ID, enode, NODE_3_PORT)
                 return "$SHEBANG \n${script.trimMargin()}"
             }
             else -> return "Unknown Type"
@@ -101,7 +101,8 @@ object GenesisProvider {
 
     fun updateGenesisExtraData(addrs: Triple<String, String, String>) {
 
-        val extraDataString = "${addrs.first.substring(2)}${addrs.second.substring(2)}${addrs.third.substring(2)}"
+        // val extraDataString = "${addrs.first.substring(2)}${addrs.second.substring(2)}${addrs.third.substring(2)}"
+        val extraDataString = "${addrs.second.substring(2)}${addrs.third.substring(2)}"
         var input = genesisTemplateConfig("Genesis.tmpl")
         val inputAsString = input!!.bufferedReader().use { it.readText() }
 
