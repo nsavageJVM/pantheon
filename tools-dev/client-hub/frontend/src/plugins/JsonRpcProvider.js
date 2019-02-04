@@ -27,6 +27,15 @@ const rpcMessageProvider = (mssg, id) => {
       return result;
 }
 
+const rpcMessageParamsProvider = (params) => {
+    let result = [];
+    params.forEach(function (value) {
+        result.push(value)
+      });
+      
+    return result;
+}
+
 
 
 
@@ -37,7 +46,8 @@ export default {
     install (Vue, options) {
         Vue.prototype.$jsonRpcMethods = MESSAGE_TEMPATE;
         Vue.prototype.$jsonRpcTopics = MESSAGE_TOPICS;
-        Vue.prototype.$jsonRpcMessageProvider = (params, id) => rpcMessageProvider(params, id )
+        Vue.prototype.$jsonRpcMessageProvider = (params, id) => rpcMessageProvider(params, id );
+        Vue.prototype.$rpcMessageParamsProvider = (params) => rpcMessageParamsProvider(params);
 
     }
 }

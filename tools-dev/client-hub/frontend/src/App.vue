@@ -56,7 +56,7 @@
 <script>
 export default {
   mounted() {
-     //  this.lib_createJsonRpcApi();
+      this.lib_createJsonRpcApi();
   },
   data: function() {
       return {  showNav: false }

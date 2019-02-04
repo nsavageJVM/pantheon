@@ -110,7 +110,7 @@ Vue.mixin( {
         this.$store.state.ws_jrpc.send(JSON.stringify(mssg));
  
     },
-    lib_getAccount() {
+    lib_getAllAccounts() {
       const savedStore = this.$store;
       var token = $cookies.get('JSESSIONID') || 0;
       console.log('lib_getAccount token as json:  '+JSON.stringify(token)   );

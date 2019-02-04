@@ -3,12 +3,15 @@
 
 export const MESSAGE_TEMPATE  = Object.freeze({
     NET_PEER_COUNT :'{"method":"net_peerCount", "params":[ ] }',
-    ETH_BLOCK_NUMBER: '{"method":"eth_blockNumber","params":[]}'
+    ETH_BLOCK_NUMBER: '{"method":"eth_blockNumber","params":[]}',
+    ETH_BALANCE: '{"method":"eth_getBalance","params":[]}'
  
 })
 
 export const MESSAGE_TOPICS  = Object.freeze({
     NET_PEER_COUNT :"p_ct",
-    ETH_BLOCK_NUMBER: 'e-num'
+    ETH_BLOCK_NUMBER: 'e-num',
+    ETH_BALANCE: 'e-bal'
+
  
 })

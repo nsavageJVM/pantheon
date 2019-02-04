@@ -21,7 +21,9 @@ export default new Vuex.Store({
     peer_count:0,
     last_block:-1,
     // accounts
-    accts:{ }
+    accts:{ },
+    // accounts balance
+    accts_bal_query_result: 0
 
 
 
@@ -51,6 +53,12 @@ export default new Vuex.Store({
       } else if(jrpc_data.id === MESSAGE_TOPICS.ETH_BLOCK_NUMBER) {
         console.log(MESSAGE_TOPICS.ETH_BLOCK_NUMBER+" :: "+jrpc_data.result);
         state.last_block = parseInt(jrpc_data.result);
+      }
+        else if(jrpc_data.id === MESSAGE_TOPICS.ETH_BALANCE) {
+        console.log(MESSAGE_TOPICS.ETH_BALANCE+" :: "+jrpc_data.result);
+        console.log("check is parse int ok"+" :: "+ parseInt(jrpc_data.result));
+        state.accts_bal_query_result = parseInt(jrpc_data.result);
+        console.log("state.accts_bal_query_result "+" :: "+ state.accts_bal_query_result);
       }
 
     },
