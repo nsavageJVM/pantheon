@@ -22,6 +22,10 @@ export default {
   name: 'home',
   components: {
  
-  }
+  },
+   mounted: function () {
+  
+   },
+ 
 }
 </script>

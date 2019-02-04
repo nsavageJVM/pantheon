@@ -19,7 +19,10 @@ export default new Vuex.Store({
     ws_jrpc: null,
     // json rpc api data
     peer_count:0,
-    last_block:-1
+    last_block:-1,
+    // accounts
+    accts:{ }
+
 
 
   },
@@ -52,6 +55,9 @@ export default new Vuex.Store({
 
     },
 
+    setAccounts(state, payload ) {
+      state.accts =  payload
+    },
 
   },
   getters: {

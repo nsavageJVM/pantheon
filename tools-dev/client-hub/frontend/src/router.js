@@ -23,6 +23,15 @@ export default new Router({
       path: '/node',
       name: 'health',
       component: () => import(/* webpackChunkName: "health" */ './views/NodeInfo.vue')
+    },
+
+    {
+      path: '/accts',
+      name: 'accounts',
+      component: () => import(/* webpackChunkName: "accounts" */ './views/Accts.vue')
     }
+
+
+
   ]
 })

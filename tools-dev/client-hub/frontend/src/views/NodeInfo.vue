@@ -90,8 +90,6 @@ text.apexcharts-datalabel-value {
 </style>
 
 <script>
- 
- 
 export default {
   name: 'NodeCpu',
   data: function() {
@@ -137,7 +135,7 @@ export default {
       //mx bean data  {  mx_mem_total, mx_db_size, mx_disk_free_space} 
     mx_cpu() {
        var storeData =  this.$store.state.mx_cpu;
-       storeData = storeData*10;
+       storeData = storeData*4;
        return [storeData];
     },
 

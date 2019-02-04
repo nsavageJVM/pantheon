@@ -1,10 +1,8 @@
 package keth.tools.client
 
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
-import io.reactivex.processors.PublishProcessor
-import io.reactivex.schedulers.Schedulers
+import keth.tools.client.db.DbManager
 import keth.tools.client.mx.MachineInfoDTO
 import keth.tools.client.mx.MxDataProvider
 import kotlinx.coroutines.CoroutineScope
@@ -18,8 +16,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.handler.annotation.SendTo
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.messaging.simp.config.MessageBrokerRegistry
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -29,17 +26,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer
 import org.springframework.security.crypto.password.NoOpPasswordEncoder
-import org.springframework.security.web.util.matcher.RequestMatcher
 import org.springframework.stereotype.Controller
-import java.util.Locale
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-import org.springframework.security.web.util.matcher.AndRequestMatcher
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer
-import javax.servlet.http.HttpServletRequest
+import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
+import java.util.*
+
 
 @SpringBootApplication
 class ClientGuiApplication
@@ -50,6 +46,7 @@ fun main(args: Array<String>) {
 
 @Controller
 class Dispatcher {
+
 
 
 	@RequestMapping("/")
@@ -76,7 +73,35 @@ class Dispatcher {
 	fun loginError(): String {
 		return "login-error"
 	}
+
+
+
 }
+
+
+@RestController
+class RestData {
+
+	class Accounts(var acct1:String, var acct2:String, var acct3:String)
+
+
+	@Autowired
+	lateinit var db: DbManager
+
+
+	@RequestMapping( "/accts-data_path", method = arrayOf(RequestMethod.POST) )
+	fun getAccounts( ) : Accounts  {
+		if(!db.isInitialised) {
+			db.initDb()
+		}
+
+		val  addresses: Triple<String, String, String> = db.getAccounts()
+
+		return Accounts(addresses.first, addresses.second, addresses.third)
+
+	}
+}
+
 
 
 @Controller
@@ -86,7 +111,7 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider) {
 
 
     @Autowired
-	lateinit var  template: SimpMessagingTemplate
+	lateinit var  maDataMessages: SimpMessagingTemplate
 
 	    init {
 			GlobalScope.launch {
@@ -106,7 +131,7 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider) {
 	}
 
 	suspend fun broadcast(dto: MachineInfoDTO) {
-		template.convertAndSend("/topic/mx", mapper.writeValueAsString(dto));
+		maDataMessages.convertAndSend("/topic/mx", mapper.writeValueAsString(dto));
 	}
 }
 
@@ -169,9 +194,11 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
 				.and()
 				.authorizeRequests()
 				.antMatchers("/tools").hasAnyRole("USER","ADMIN")
+				.antMatchers("/accts-data_path").hasAnyRole("USER","ADMIN")
 				.antMatchers("/").hasAnyRole("USER","ADMIN")
 				.antMatchers("/index**").hasAnyRole("USER","ADMIN")
 				.antMatchers("**/mx-data_path/**").permitAll()
+
 				.and()
 				.exceptionHandling().accessDeniedPage("/tools/403.html");
 
@@ -199,10 +226,16 @@ class  PropertyValues {
 
 	lateinit var dbDir: String
 
+	@Bean
+	open fun springSecurityDialect(): SpringSecurityDialect {
+		return SpringSecurityDialect()
+	}
+
+	@Bean
+	open fun objectMapperBuilder(): Jackson2ObjectMapperBuilder
+			= Jackson2ObjectMapperBuilder().modulesToInstall(KotlinModule())
+
+
 }
 
 
-@Bean
-fun springSecurityDialect(): SpringSecurityDialect {
-	return SpringSecurityDialect()
-}

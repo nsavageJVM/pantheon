@@ -56,10 +56,6 @@ object DbManager : DbManagerBase() {
 
     }
 
-//    fun doPutBytes(key: String, value: BytesValue) {
-//        db!!.put(key.toByteArray(Charsets.UTF_8),  value.extractArray( ));
-//
-//    }
 
     fun printKeys() {
         val iter = db!!.newIterator()

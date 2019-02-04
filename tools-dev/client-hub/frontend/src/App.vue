@@ -22,8 +22,7 @@
                                     <router-link to="/about" class="navbar-item">Info</router-link>
                                     <hr class="navbar-divider">
                                     <router-link to="/node" class="navbar-item">Node Health</router-link>
-                                    <a class="navbar-item">Stream Headers</a>
-                                    <a class="navbar-item">Account Management</a>
+                                       <router-link to="/accts" class="navbar-item">Accounts</router-link>
                                     <a class="navbar-item">Contract Management</a>
                                 </div>
                             </div>
@@ -57,7 +56,7 @@
 <script>
 export default {
   mounted() {
-       this.lib_createJsonRpcApi();
+     //  this.lib_createJsonRpcApi();
   },
   data: function() {
       return {  showNav: false }

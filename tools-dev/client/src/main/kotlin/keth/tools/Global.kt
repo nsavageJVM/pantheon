@@ -23,8 +23,6 @@ object Constants {
     val genesisTemplateOutPath  = panBaseProject.resolve("tools-dev/client/src/main/resources/prichainGenesis.json")
 
 
-    val sealersPath = "sealers"
-
     val bootNodePath = chainBasePath.resolve("node1/cdata")
     val node2Path = chainBasePath.resolve("node2/cdata")
     val node3Path = chainBasePath.resolve("node3/cdata")
@@ -33,8 +31,6 @@ object Constants {
     val node2ScriptPath = chainBasePath.resolve("node2")
     val node3ScriptPath = chainBasePath.resolve("node3")
 
-
-    val bootNodeKeyPubPath = "publicKey"
 
     val genesisPath = chainBasePath.resolve("prichainGenesis.json")
 
@@ -86,18 +82,6 @@ object KeyUtils {
         val nodeKey3ECKeyPair =   ECKeyPair.create( nodeKey3.privateKey.encodedBytes.extractArray())
         val nodeKey3Credentials = Credentials.create(nodeKey3ECKeyPair)
 
-//        var g = Constants.bootNodePath.resolve(Constants.bootNodeKeyPubPath).toFile()
-//
-//        if(!g.exists()){
-//            g.createNewFile();
-//        }
-//
-//        try {
-//            Files.newBufferedWriter(g.toPath(), StandardCharsets.UTF_8)
-//                    .use({ fileWriter -> fileWriter.write(bNodeKey.getPublicKey().toString()) })
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//        }
 
         return Triple(bNodeCredentials!!.address, nodeKey2Credentials!!.address, nodeKey3Credentials!!.address )
     }

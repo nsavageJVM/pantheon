@@ -1,4 +1,4 @@
-package keth.tools.client.clientgui
+package keth.tools.client.gui
 
 import io.rsocket.kotlin.DefaultPayload
 import io.rsocket.kotlin.RSocketFactory

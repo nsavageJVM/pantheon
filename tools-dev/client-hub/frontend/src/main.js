@@ -12,6 +12,7 @@ import VueCookies from 'vue-cookies'
  
 import SockJS from "sockjs-client";
 import Stomp from "webstomp-client";
+import axios from 'axios'
 
 import App from './App.vue'
 import router from './router'
@@ -74,8 +75,7 @@ Vue.mixin( {
       const savedStore = this.$store;
    
       var token = $cookies.get('JSESSIONID') || 0;
-      console.log('token:  '+token);
-      console.log('token as json:  '+JSON.stringify(token)   );
+      console.log('lib_createMxDataSocket token as json:  '+JSON.stringify(token)   );
         var headers = {
             Authorization : 'Bearer ' + token,
         };
@@ -106,9 +106,24 @@ Vue.mixin( {
     },
 
     lib_processJsonRpc(mssg) {
-       // console.log('lib_processJsonRpc '+JSON.stringify(mssg)); 
+       // see lib_createJsonRpcApi for callback
         this.$store.state.ws_jrpc.send(JSON.stringify(mssg));
  
+    },
+    lib_getAccount() {
+      const savedStore = this.$store;
+      var token = $cookies.get('JSESSIONID') || 0;
+      console.log('lib_getAccount token as json:  '+JSON.stringify(token)   );
+ 
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      axios.post('/accts-data_path').then((response) => {
+        console.log('response.data acct1:  '+ response.data.acct1     );
+        savedStore.commit('setAccounts', response.data);
+      })
+      .catch((error) => {
+          console.log(error);
+      });
+
     }
 
 } // end methods

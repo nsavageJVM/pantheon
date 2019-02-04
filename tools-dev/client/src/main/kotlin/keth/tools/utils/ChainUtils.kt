@@ -118,7 +118,7 @@ fun bootStrapChainArtifacts(): Triple<String, String, String>   {
     InitChain.buildDistribution()
     InitChain.copyDistribution()
     InitChain.initBinDir()
-
+    // see DbManager bootStrapDbArtifacts
     val addrs:Triple<String,String,String> = KeyUtils.generateKeysForNodes()
     GenesisProvider.updateGenesisExtraData(addrs)
     InitChain.copyGenesis()
