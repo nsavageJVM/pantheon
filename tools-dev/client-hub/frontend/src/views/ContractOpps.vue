@@ -61,12 +61,13 @@ export default {
    },
    methods: {
       deployContract: function( ) {
-         this.$store.state.sol_addr = '0x60874873b677db1422ad44f5f6f888d169ce2a78';
-         //   this.lib_deployContract();
+        // this.$store.state.sol_addr = '0x60874873b677db1422ad44f5f6f888d169ce2a78';
+         this.lib_deployContract();
       },
 
       searchContract: function( ) {
-            this.$store.state.sol_addr = '0x60874873b677db1422ad44f5f6f888d169ce2a78';
+          //  this.$store.state.sol_addr = '0x60874873b677db1422ad44f5f6f888d169ce2a78';
+           this.lib_searchContract();
       }
 
 
