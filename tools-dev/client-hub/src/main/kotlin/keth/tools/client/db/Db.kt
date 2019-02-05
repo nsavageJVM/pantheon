@@ -134,7 +134,11 @@ class DbManager : DbManagerBase() {
 
     private  fun doGet(key: String): String {
 
-        val value = db!!.get(key.toByteArray(Charsets.UTF_8))
+        var value = db!!.get(key.toByteArray(Charsets.UTF_8))
+        if(value == null) {
+            return consts.NULL_CONTRACT_ADDRESS_VALUE
+        }
+
         return String(value, Charsets.UTF_8)
     }
 
@@ -146,6 +150,11 @@ class DbManager : DbManagerBase() {
 
         if (db_encryption_key == null) {
             db_encryption_key =  getDbEncryptionKey(strPass!!.toCharArray(), keyPass!!.toCharArray())
+        }
+
+        var value = doGet(key)
+        if(value.equals(consts.NULL_CONTRACT_ADDRESS_VALUE)) {
+            return  consts.NULL_CONTRACT_ADDRESS_VALUE
         }
 
         val cr = objectMapper.readValue(doGet(key), CipherWithParams::class.java)

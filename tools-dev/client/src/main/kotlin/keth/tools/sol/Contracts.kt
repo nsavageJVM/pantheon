@@ -106,10 +106,10 @@ object Generator : ContractBase() {
 fun main() {
 
     Generator.createWeb3Credentials()
-    Generator.setABIFiles(Generator.abiDirPath.resolve("Simple.abi"),
-                                Generator.abiDirPath.resolve("Simple.bin"), Generator.abiDirOutPath)
-
-    Generator.generateWrapper()
+//    Generator.setABIFiles(Generator.abiDirPath.resolve("Simple.abi"),
+//                                Generator.abiDirPath.resolve("Simple.bin"), Generator.abiDirOutPath)
+//
+//    Generator.generateWrapper()
 
     Generator.deployContract()
 

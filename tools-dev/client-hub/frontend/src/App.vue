@@ -5,7 +5,7 @@
                 <nav class="navbar" role="navigation" aria-label="main navigation">
 
                     <div class="navbar-brand">
-                        <a class="navbar-item" href="/"> Chai(n) Tools </a>
+                        <a class="navbar-item" href="/tools"> Chai(n) Tools </a>
 
                         <a role="button" class="navbar-burger" @click="showNav = !showNav" :class="{ 'is-active': showNav }">
                             <span aria-hidden="true"></span>
@@ -56,7 +56,9 @@
 <script>
 export default {
   mounted() {
-      // this.lib_createJsonRpcApi();
+       this.lib_createJsonRpcApi();
+       this.lib_searchContract();
+
   },
   data: function() {
       return {  showNav: false }

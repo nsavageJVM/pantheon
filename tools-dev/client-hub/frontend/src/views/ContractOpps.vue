@@ -4,16 +4,13 @@
 
    <div class="column is-3">
       <nav class="panel" >
-          <p class="panel-heading">Contract Operations</p>
-          <div  v-if= "address === ' '" style="position:relative;float:left;padding:10px 0 0 10px;"  >
+           <p class="panel-heading">Contract Operations</p>
+           <div  v-if= "sol_exists === 0" style="position:relative;float:left;padding:10px 0 0 10px;"  >
             <a v-on:click="deployContract()" class="button is-link" 
                               style="display:block;margin:10px 0 0 10px;">
                Deploy Contract</a>
-            <a v-on:click="searchContract()" class="button is-link"  
-                              style="display:block;margin:10px 0 0 10px">
-               Contract From DB</a>
-          </div>
-         <div  v-if= "address !== ' '" style="position:relative;float:left;padding:10px 0 0 10px;"  >
+           </div>
+           <div  v-if= "sol_exists === 1" style="position:relative;float:left;padding:10px 0 0 10px;"  >
             <a class="button is-success" style="display:block;margin:10px 0 0 10px;">
                Deployed Contract Exists</a>
  
@@ -24,7 +21,7 @@
     <div class="column is-9" >
       <nav class="panel">
             <p class="panel-heading" style="max-width:80%;">Contract Data</p>
-             <div  v-if= "address !== ' '"> 
+             <div  v-if= "sol_exists === 1"> 
               <span style="position:relative;float:left;padding-left:10px;margin:24px 0 0 0;" > 
                  <p class="is-medium has-text-grey" 
                               style="display:inline;padding-right:10px;"><strong>Address</strong></p>
@@ -52,11 +49,29 @@ export default {
 
      }
   },
+
+    beforeMount () {
+      var solVal =  this.$store.state.sol_exists; 
+      this.$data.sol_exists = solVal; 
+      
+      if(solVal === 1) {
+         this.$data.address = this.$store.state.sol_addr; 
+      }  
+  },
+  
    
    computed: {  
+      
       address() {
         var storeData =  this.$store.state.sol_addr;
         return storeData;
+        //return ' ';
+        },
+     
+      sol_exists() {
+        var storeData =  this.$store.state.sol_exists;
+        return storeData;
+        // return 1;
         },
    },
    methods: {
@@ -64,13 +79,6 @@ export default {
         // this.$store.state.sol_addr = '0x60874873b677db1422ad44f5f6f888d169ce2a78';
          this.lib_deployContract();
       },
-
-      searchContract: function( ) {
-          //  this.$store.state.sol_addr = '0x60874873b677db1422ad44f5f6f888d169ce2a78';
-           this.lib_searchContract();
-      }
-
-
 
     }
 }

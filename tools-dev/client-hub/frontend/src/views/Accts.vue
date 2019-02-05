@@ -54,6 +54,7 @@ export default {
   },
 
   beforeMount () {
+
     this.$data.accts_bal_query_result = 0;
   },
   

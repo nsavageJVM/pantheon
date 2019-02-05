@@ -53,7 +53,8 @@ class ClientHubSolTests {
     fun solGetContractAddressTest() {
 
         db.initDb()
-        println( db.getContractAddress(constants.CONTRACT_ADDRESS_KEY))
+        val result = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY)
+        println(result)
 
 
 

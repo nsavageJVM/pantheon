@@ -27,6 +27,7 @@ class GlobalConstants {
     val BOOT_NODE_PATH = CHAIN_BASE_PATH.resolve("node1/cdata")
 
     val CONTRACT_ADDRESS_KEY="c_addres"
+    val NULL_CONTRACT_ADDRESS_VALUE=String(charArrayOf('\u0020'))
 
 
     fun loadKeyFile(path: Path): SECP256K1.KeyPair {

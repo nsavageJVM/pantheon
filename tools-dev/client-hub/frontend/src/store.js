@@ -27,6 +27,7 @@ export default new Vuex.Store({
 
     // contract address
     sol_addr:' ',
+    sol_exists:0,
 
 
   },
@@ -47,7 +48,7 @@ export default new Vuex.Store({
 
     // json-rpc api
     setJsonRpcData(state, jrpc_data) {
-      console.log("store "+ JSON.stringify(jrpc_data));
+      console.log("store "+ JSON.stringify(jrpc_data) );
 
       if(jrpc_data.id === MESSAGE_TOPICS.NET_PEER_COUNT) {
         console.log(MESSAGE_TOPICS.NET_PEER_COUNT+" :: "+jrpc_data.result);
@@ -58,7 +59,6 @@ export default new Vuex.Store({
       }
         else if(jrpc_data.id === MESSAGE_TOPICS.ETH_BALANCE) {
         console.log(MESSAGE_TOPICS.ETH_BALANCE+" :: "+jrpc_data.result);
-        console.log("check is parse int ok"+" :: "+ parseInt(jrpc_data.result));
         state.accts_bal_query_result = parseInt(jrpc_data.result);
         console.log("state.accts_bal_query_result "+" :: "+ state.accts_bal_query_result);
       }
@@ -66,11 +66,18 @@ export default new Vuex.Store({
     },
 
     setAccounts(state, payload) {
-      state.accts =  payload
+      state.accts =  payload;
     },
 
     setContractAddress(state, payload) {
-      state.sol_addr =  payload
+      state.sol_addr =  payload;
+      if(payload === ' ') {
+        console.log("setContractAddress found empty address");
+        state.sol_exists = 0;
+      } else {
+        state.sol_exists = 1;
+      }
+  
     },
 
   },
