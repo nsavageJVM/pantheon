@@ -110,6 +110,7 @@ Vue.mixin( {
         this.$store.state.ws_jrpc.send(JSON.stringify(mssg));
  
     },
+
     lib_getAllAccounts() {
       const savedStore = this.$store;
       var token = $cookies.get('JSESSIONID') || 0;
@@ -123,6 +124,26 @@ Vue.mixin( {
       .catch((error) => {
           console.log(error);
       });
+
+    },
+
+    lib_deployContract() {
+      const savedStore = this.$store;
+      var token = $cookies.get('JSESSIONID') || 0;
+      console.log('lib_getAccount token as json:  '+JSON.stringify(token)   );
+ 
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      axios.post('/deploy_contract').then((response) => {
+        console.log('response.data ContractAddress:  '+ response.data.solAddr     );
+        savedStore.commit('setContractAddress', response.data.solAddr);
+      })
+      .catch((error) => {
+          console.log(error);
+      });
+
+
+
+      
 
     }
 

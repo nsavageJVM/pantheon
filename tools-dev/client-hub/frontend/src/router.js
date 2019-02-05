@@ -29,8 +29,12 @@ export default new Router({
       path: '/accts',
       name: 'accounts',
       component: () => import(/* webpackChunkName: "accounts" */ './views/Accts.vue')
-    }
-
+    },
+    {
+      path: '/contracts',
+      name: 'contracts',
+      component: () => import(/* webpackChunkName: "accounts" */ './views/ContractOpps.vue')
+    },
 
 
   ]

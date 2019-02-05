@@ -85,6 +85,8 @@ class RestData {
 
 	class Accounts(var acct1:String, var acct2:String, var acct3:String)
 
+	class Addresss(var solAddr:String)
+
 	@Autowired
 	lateinit var constants: GlobalConstants
 
@@ -109,23 +111,21 @@ class RestData {
 	}
 
 	@RequestMapping( "/deploy_contract", method = arrayOf(RequestMethod.POST) )
-	fun deployContract( ) : String  {
+	fun deployContract( ) : Addresss  {
 		if(!db.isInitialised) {
 			db.initDb()
 		}
-		return 	solOpps.deployContract()
+		return Addresss(solOpps.deployContract())
 	}
 
 
 	@RequestMapping( "/contract_addr", method = arrayOf(RequestMethod.POST) )
-	fun getContractAddress( ) : String  {
+	fun getContractAddress( ) : Addresss  {
 		if(!db.isInitialised) {
 			db.initDb()
 		}
-		db.getContractAddress(constants.CONTRACT_ADDRESS_KEY)
 
-
-		return ""
+		return Addresss(db.getContractAddress(constants.CONTRACT_ADDRESS_KEY))
 
 	}
 
@@ -226,6 +226,8 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
 				.authorizeRequests()
 				.antMatchers("/tools").hasAnyRole("USER","ADMIN")
 				.antMatchers("/accts-data_path").hasAnyRole("USER","ADMIN")
+				.antMatchers("/deploy_contract").hasAnyRole("USER","ADMIN")
+				.antMatchers("/contract_addr").hasAnyRole("USER","ADMIN")
 				.antMatchers("/").hasAnyRole("USER","ADMIN")
 				.antMatchers("/index**").hasAnyRole("USER","ADMIN")
 				.antMatchers("**/mx-data_path/**").permitAll()

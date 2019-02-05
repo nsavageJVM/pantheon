@@ -22,11 +22,11 @@
                                     <router-link to="/about" class="navbar-item">Info</router-link>
                                     <hr class="navbar-divider">
                                     <router-link to="/node" class="navbar-item">Node Health</router-link>
-                                       <router-link to="/accts" class="navbar-item">Accounts</router-link>
-                                    <a class="navbar-item">Contract Management</a>
+                                    <router-link to="/accts" class="navbar-item">Accounts</router-link>
+                                    <router-link to="/contracts" class="navbar-item">Contract Management</router-link>
                                 </div>
                             </div>
-                        </div>
+                        </div> 
 
                         <div class="navbar-end">
                             <div class="navbar-item">
@@ -56,7 +56,7 @@
 <script>
 export default {
   mounted() {
-      this.lib_createJsonRpcApi();
+      // this.lib_createJsonRpcApi();
   },
   data: function() {
       return {  showNav: false }

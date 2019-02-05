@@ -23,8 +23,10 @@ export default new Vuex.Store({
     // accounts
     accts:{ },
     // accounts balance
-    accts_bal_query_result: 0
+    accts_bal_query_result: 0,
 
+    // contract address
+    sol_addr:' ',
 
 
   },
@@ -63,8 +65,12 @@ export default new Vuex.Store({
 
     },
 
-    setAccounts(state, payload ) {
+    setAccounts(state, payload) {
       state.accts =  payload
+    },
+
+    setContractAddress(state, payload) {
+      state.sol_addr =  payload
     },
 
   },
