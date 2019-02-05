@@ -33,6 +33,16 @@ repositories {
 	maven { url 'https://oss.jfrog.org/libs-snapshot' }
 }
 
+def base =System.getProperty("user.home")
+
+sourceSets {
+	main {
+		solidity {
+			outputDir = file("${base}/chains/private/sol")
+		}
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -55,6 +65,7 @@ dependencies {
 	compile 'io.rsocket.kotlin:rsocket-transport-netty:0.9-SNAPSHOT'
 
 	implementation ('org.web3j:core:4.1.1')
+	implementation 'org.web3j:codegen:4.1.1'
 	implementation 'org.rocksdb:rocksdbjni:5.17.2'
 
 

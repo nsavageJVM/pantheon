@@ -18,7 +18,7 @@ class ClientHubConfigTests {
 
     @Test
     fun configTest() {
-        println(constants.dbCryptoKeyPass)
-        println(constants.dbCryptoKeyStorePass)
+        println(constants.DBCRYPTO_KEY_PASS)
+        println(constants.DB_CRYPTO_KEY_STORE_PASS)
     }
 }

@@ -68,11 +68,6 @@ class DbManager : DbManagerBase() {
     }
 
 
-    fun doPutStrings(key: String, value: String) {
-        db!!.put(key.toByteArray(Charsets.UTF_8), value.toByteArray(Charsets.UTF_8));
-
-    }
-
 
     fun printKeys() {
         val iter = db!!.newIterator()
@@ -86,17 +81,35 @@ class DbManager : DbManagerBase() {
         }
     }
 
-    fun doGet(key: String): String {
 
-        val value = db!!.get(key.toByteArray(Charsets.UTF_8))
-        return String(value, Charsets.UTF_8)
+    fun getContractAddress( ADDRESS_KEY: String ) :String {
+
+       return getAccount(ADDRESS_KEY);
     }
+
+
+    fun storeContractAddress( ADDRESS_KEY: String, contractAddress: String) {
+
+        if(keyPass == null) {
+            keyPass = consts.DBCRYPTO_KEY_PASS
+            strPass = consts.DB_CRYPTO_KEY_STORE_PASS
+        }
+
+        if (db_encryption_key == null) {
+            db_encryption_key =  getDbEncryptionKey(strPass!!.toCharArray(), keyPass!!.toCharArray())
+        }
+
+        doPutStrings(ADDRESS_KEY,  objectMapper.writeValueAsString(
+               doFinalEncrypt(db_encryption_key!!, BytesValue.wrap(contractAddress.toByteArray()))))
+
+    }
+
 
     fun getAccounts(): Triple<String, String, String> {
 
         if(keyPass == null) {
-            keyPass = consts.dbCryptoKeyPass
-            strPass = consts.dbCryptoKeyStorePass
+            keyPass = consts.DBCRYPTO_KEY_PASS
+            strPass = consts.DB_CRYPTO_KEY_STORE_PASS
         }
 
 
@@ -110,14 +123,39 @@ class DbManager : DbManagerBase() {
         return Triple(addr1, addr2, addr3)
     }
 
+
+    //== private
+
+
+    private  fun doPutStrings(key: String, value: String) {
+        db!!.put(key.toByteArray(Charsets.UTF_8), value.toByteArray(Charsets.UTF_8));
+
+    }
+
+    private  fun doGet(key: String): String {
+
+        val value = db!!.get(key.toByteArray(Charsets.UTF_8))
+        return String(value, Charsets.UTF_8)
+    }
+
     private fun getAccount(key: String): String {
+        if(keyPass == null) {
+            keyPass = consts.DBCRYPTO_KEY_PASS
+            strPass = consts.DB_CRYPTO_KEY_STORE_PASS
+        }
+
+        if (db_encryption_key == null) {
+            db_encryption_key =  getDbEncryptionKey(strPass!!.toCharArray(), keyPass!!.toCharArray())
+        }
+
         val cr = objectMapper.readValue(doGet(key), CipherWithParams::class.java)
         return String(doFinalDeCrypt( db_encryption_key!!, cr).extractArray(), Charsets.UTF_8)
     }
 
 
-    fun getDbEncryptionKey(storePass: CharArray, keyPass: CharArray): SecretKey {
+    private fun getDbEncryptionKey(storePass: CharArray, keyPass: CharArray): SecretKey {
 
+        // keyStore is for secret key re db encryption
         val keyStore = KeyStore.getInstance("BKS", "BC");
         val inStream = FileInputStream(consts!!.KEY_STORE_PATH.toFile())
         keyStore.load(inStream, storePass);

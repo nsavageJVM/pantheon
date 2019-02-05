@@ -82,6 +82,7 @@ task initDirs {
         mkdir "${base}/chains/private/node1/cdata"
         mkdir "${base}/chains/private/node2/cdata"
         mkdir "${base}/chains/private/node3/cdata"
+        mkdir "${base}/chains/private/sol"
     }
 }
 

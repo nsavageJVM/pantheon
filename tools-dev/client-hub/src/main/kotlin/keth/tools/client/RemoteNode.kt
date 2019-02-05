@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.client.db.DbManager
 import keth.tools.client.mx.MachineInfoDTO
 import keth.tools.client.mx.MxDataProvider
+import keth.tools.client.sol.ContractOperations
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
@@ -84,9 +85,15 @@ class RestData {
 
 	class Accounts(var acct1:String, var acct2:String, var acct3:String)
 
+	@Autowired
+	lateinit var constants: GlobalConstants
 
 	@Autowired
 	lateinit var db: DbManager
+
+	@Autowired
+	lateinit var solOpps: ContractOperations
+
 
 
 	@RequestMapping( "/accts-data_path", method = arrayOf(RequestMethod.POST) )
@@ -100,6 +107,30 @@ class RestData {
 		return Accounts(addresses.first, addresses.second, addresses.third)
 
 	}
+
+	@RequestMapping( "/deploy_contract", method = arrayOf(RequestMethod.POST) )
+	fun deployContract( ) : String  {
+		if(!db.isInitialised) {
+			db.initDb()
+		}
+		return 	solOpps.deployContract()
+	}
+
+
+	@RequestMapping( "/contract_addr", method = arrayOf(RequestMethod.POST) )
+	fun getContractAddress( ) : String  {
+		if(!db.isInitialised) {
+			db.initDb()
+		}
+		db.getContractAddress(constants.CONTRACT_ADDRESS_KEY)
+
+
+		return ""
+
+	}
+
+
+
 }
 
 
