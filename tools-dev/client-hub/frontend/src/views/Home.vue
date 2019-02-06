@@ -18,9 +18,10 @@
       <p class="panel-heading">Contracts</p>
       <div v-if= "num_contracts !== 0" >
         <select  v-model="contract_select" @change="onContractSelect($event)"
-                style="postion:relative;float:left;margin:10px 0 0 10px;" class="form-control"  >
+                style="postion:relative;float:left;margin:10px 0 0 10px;"    >
             <option  selected disabled value=""  >Contracts</option>
-            <option v-for="(text, key) in contracts_list" :key="text">{{ key }}</option>
+            <!-- 2nd item is iter object key(contract name), here text, :value binds to the event value, here addr -->
+            <option v-for="(key, text) in contracts_list" :value="key" :key="text">{{ text }}</option>
         </select>
       </div>  
       <div v-if= "num_contracts === 0" >
@@ -51,10 +52,10 @@ export default {
 
   data:  function() {
      return {
-    
-         contracts_list : {
-          'Simple storage': '0x4c6666106f61a85a7ca15b95e8c072b1ec902439',
-          'EthToken': '0x217c0a153fcfb74946b8a15f7b3de958b3ba310b'  },
+        //  contracts_list : {
+        //   'Simple storage': '0x4c6666106f61a85a7ca15b95e8c072b1ec902439',
+        //   'EthToken': '0x217c0a153fcfb74946b8a15f7b3de958b3ba310b'  },
+          // only used to select drop down default val
           contract_select: "",
           
      }
@@ -62,7 +63,7 @@ export default {
 
   methods:{
     onContractSelect :function(event){
-        alert(event.target.value);
+        alert(JSON.stringify(event.target.value));
       }
   },
 
@@ -84,10 +85,20 @@ export default {
       computed: {  
       
        num_contracts() {
-        var storeData =  this.$store.state.sol_exists;
-        return storeData;
-         // return 1;
+         var storeData =  this.$store.state.sol_exists;
+         return storeData;
+        //  return 1;
         },
+
+        contracts_list() {
+          var sol_name =  this.$store.state.sol_name;
+          var sol_addr =  this.$store.state.sol_addr;
+          // var sol_name  =  'Simple storage';
+          // var sol_addr  =  '0x4c6666106f61a85a7ca15b95e8c072b1ec902439';
+          var result = {};
+          result[sol_name] = sol_addr;
+          return result;
+        }
  
    },
  

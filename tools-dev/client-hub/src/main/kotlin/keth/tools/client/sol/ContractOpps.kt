@@ -117,16 +117,12 @@ class ContractOperations : ContractBase() {
         return contractAddress;
     }
 
-    fun runContractMethod() {
+    fun getDeployedContract(c_addr:String):Simple{
 
-        val c_addr =  db.getContractAddress(consts.CONTRACT_ADDRESS_KEY)
 
         val simple = Simple
                 .load( c_addr, Web3j.build(HttpService()), getCredentials(), STATIC_GAS_PROVIDER)
-
-
-
-
+        return simple
     }
 
     //== private

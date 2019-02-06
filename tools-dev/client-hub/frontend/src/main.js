@@ -129,6 +129,7 @@ Vue.mixin( {
 
     lib_deployContract() {
       const savedStore = this.$store;
+      const context = this;
       var token = $cookies.get('JSESSIONID') || 0;
       console.log('lib_deployContract token as json:  '+JSON.stringify(token)   );
  
@@ -136,6 +137,8 @@ Vue.mixin( {
       axios.post('/deploy_contract').then((response) => {
         console.log('response.data ContractAddress:  '+ response.data.solAddr     );
         savedStore.commit('setContractAddress', response.data.solAddr);
+        // look in db for contract name to update view
+        context.lib_searchContract();
       })
       .catch((error) => {
           console.log(error);
@@ -151,7 +154,7 @@ Vue.mixin( {
 
       axios.post('/contract_addr').then((response) => {
         console.log('response.data ContractAddress:  '+ response.data.solAddr     );
-        savedStore.commit('setContractAddress', response.data.solAddr);
+        savedStore.commit('setContractAddress', response.data );
       })
       .catch((error) => {
           console.log(error);

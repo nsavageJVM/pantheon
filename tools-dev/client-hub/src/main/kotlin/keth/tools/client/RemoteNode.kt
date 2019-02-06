@@ -85,7 +85,7 @@ class RestData {
 
 	class Accounts(var acct1:String, var acct2:String, var acct3:String)
 
-	class Addresss(var solAddr:String)
+	class Addresss(var solAddr:String, var solName:String)
 
 	@Autowired
 	lateinit var constants: GlobalConstants
@@ -115,7 +115,7 @@ class RestData {
 		if(!db.isInitialised) {
 			db.initDb()
 		}
-		return Addresss(solOpps.deployContract())
+		return Addresss(solOpps.deployContract(), " ")
 	}
 
 
@@ -125,7 +125,15 @@ class RestData {
 			db.initDb()
 		}
 
-		return Addresss(db.getContractAddress(constants.CONTRACT_ADDRESS_KEY))
+		val addr = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY)
+
+		if(addr.equals(constants.NULL_CONTRACT_ADDRESS_VALUE)) {
+			return	Addresss(addr, constants.NULL_CONTRACT_ADDRESS_VALUE)
+		}
+
+		val contract = solOpps.getDeployedContract(addr)
+
+		return Addresss(addr, contract.javaClass.simpleName)
 
 	}
 

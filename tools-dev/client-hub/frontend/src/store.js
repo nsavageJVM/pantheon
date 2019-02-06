@@ -27,7 +27,8 @@ export default new Vuex.Store({
 
     // contract address
     sol_addr:' ',
-    sol_exists:0,
+    sol_name:' ',
+    sol_exists:0
 
 
   },
@@ -70,12 +71,16 @@ export default new Vuex.Store({
     },
 
     setContractAddress(state, payload) {
-      state.sol_addr =  payload;
-      if(payload === ' ') {
-        console.log("setContractAddress found empty address");
+  
+      if(payload.solName === "empty") {
+        console.log("store setContractAddress found empty address");
         state.sol_exists = 0;
+        state.sol_addr =' ';
       } else {
         state.sol_exists = 1;
+        state.sol_addr =  payload.solAddr;
+        state.sol_name =  payload.solName;
+        console.log("store setContractAddress set data as "+payload.solAddr+" "+payload.solName);
       }
   
     },
