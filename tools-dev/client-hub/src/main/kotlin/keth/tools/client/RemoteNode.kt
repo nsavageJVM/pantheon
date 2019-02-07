@@ -131,7 +131,8 @@ class RestData {
 			return	Addresss(addr, constants.NULL_CONTRACT_ADDRESS_VALUE)
 		}
 
-		val contract = solOpps.getDeployedContract(addr)
+	 	val contract = solOpps.getDeployedContract(addr)
+
 
 		return Addresss(addr, contract.javaClass.simpleName)
 

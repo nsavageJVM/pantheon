@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.client.GlobalConstants
 import keth.tools.client.db.DbManager
-import keth.tools.wrappers.Simple
+import keth.tools.wrappers.SimpleStorage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.web3j.codegen.SolidityFunctionWrapper
@@ -101,26 +101,28 @@ class ContractOperations : ContractBase() {
         get() = abiDirOutPath.toFile()
 
     override val abiFile: File
-        get() = abiDirPath.resolve("Simple.abi").toFile()
+        get() = abiDirPath.resolve("SimpleStorage.abi").toFile()
 
     override val binFile: File
-        get() = abiDirPath.resolve("Simple.bin").toFile()
+        get() = abiDirPath.resolve("SimpleStorage.bin").toFile()
 
     //  db.initDb() called in controller
     fun deployContract(): String {
 
-        val contract = Simple.deploy(web3j, getCredentials(), STATIC_GAS_PROVIDER).send();
+        val contract = SimpleStorage.deploy(web3j, getCredentials(), STATIC_GAS_PROVIDER).send();
         val contractAddress = contract.contractAddress
 
         db.storeContractAddress(consts.CONTRACT_ADDRESS_KEY, contractAddress)
 
         return contractAddress;
+
+
     }
 
-    fun getDeployedContract(c_addr:String):Simple{
+    fun getDeployedContract(c_addr:String): SimpleStorage {
 
 
-        val simple = Simple
+        val simple = SimpleStorage
                 .load( c_addr, Web3j.build(HttpService()), getCredentials(), STATIC_GAS_PROVIDER)
         return simple
     }

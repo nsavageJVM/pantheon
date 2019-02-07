@@ -19,11 +19,13 @@
                             <div class="navbar-item has-dropdown is-hoverable">
                                 <a class="navbar-link"> More</a>
                                 <div class="navbar-dropdown">
-                                    <router-link to="/about" class="navbar-item">Info</router-link>
+                                    <router-link to="/" class="navbar-item">Home</router-link>
                                     <hr class="navbar-divider">
                                     <router-link to="/node" class="navbar-item">Node Health</router-link>
                                     <router-link to="/accts" class="navbar-item">Accounts</router-link>
                                     <router-link to="/contracts" class="navbar-item">Contract Management</router-link>
+                                    <hr class="navbar-divider">
+                                    <router-link to="/about" class="navbar-item">Info</router-link>
                                 </div>
                             </div>
                         </div> 

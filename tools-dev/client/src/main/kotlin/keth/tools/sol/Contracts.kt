@@ -4,16 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.Constants
 import keth.tools.KeyUtils
-import keth.tools.wrappers.Simple
+import keth.tools.wrappers.SimpleStorage
 import org.web3j.codegen.SolidityFunctionWrapper
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.ECKeyPair
-import org.web3j.crypto.Keys
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.AbiDefinition
 import org.web3j.protocol.http.HttpService
-import org.web3j.tx.Contract
-import org.web3j.tx.ManagedTransaction
 import org.web3j.utils.Files
 import org.web3j.utils.Strings
 import java.io.File
@@ -92,7 +89,7 @@ object Generator : ContractBase() {
     }
 
     fun deployContract() {
-     val contract = Simple.deploy(web3j, chainCredentials,
+     val contract = SimpleStorage.deploy(web3j, chainCredentials,
              BigInteger.valueOf(4000000),  BigInteger.valueOf(4700000)).send();
         val contractAddress = contract.contractAddress
 
@@ -106,11 +103,9 @@ object Generator : ContractBase() {
 fun main() {
 
     Generator.createWeb3Credentials()
-//    Generator.setABIFiles(Generator.abiDirPath.resolve("Simple.abi"),
-//                                Generator.abiDirPath.resolve("Simple.bin"), Generator.abiDirOutPath)
-//
-//    Generator.generateWrapper()
-
+    Generator.setABIFiles(Generator.abiDirPath.resolve("SimpleStorage.abi"),
+                                Generator.abiDirPath.resolve("SimpleStorage.bin"), Generator.abiDirOutPath)
+    Generator.generateWrapper()
     Generator.deployContract()
 
 
