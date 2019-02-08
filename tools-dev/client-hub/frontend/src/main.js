@@ -105,6 +105,41 @@ Vue.mixin( {
       savedStore.commit('setMxStompClient', stomp);
     },
 
+    // transaction  data and callback code
+    lib_createTransactionDataSocket() {
+      console.log('lib_createTransactionDataSocket') 
+
+      const ws = new SockJS("/receipt_in_path");
+      const stomp = Stomp.over(ws);
+      const savedStore = this.$store;
+   
+      var token = $cookies.get('JSESSIONID') || 0;
+      console.log('lib_createTransactionDataSocket token as json:  '+JSON.stringify(token)   );
+        var headers = {
+            Authorization : 'Bearer ' + token,
+        };
+
+      stomp.connect( {},
+        frame => {
+          this.connected = true;
+            stomp.subscribe("/topic/receipt", tick => {
+           // {transactionHash, blockHash, blockNumber, gasUsed, statusOK, from, to} 
+            savedStore.commit('setReceiptData', JSON.parse(tick.body));
+     
+          }, headers);
+        },
+        error => {
+          console.log(error);
+          this.connected = false;
+        }
+      ); // end connect
+
+      savedStore.commit('setMxStompClient', stomp);
+    },
+
+
+
+
     lib_processJsonRpc(mssg) {
        // see lib_createJsonRpcApi for callback
         this.$store.state.ws_jrpc.send(JSON.stringify(mssg));

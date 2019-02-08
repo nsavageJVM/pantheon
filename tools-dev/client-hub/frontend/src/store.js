@@ -28,7 +28,8 @@ export default new Vuex.Store({
     // contract address
     sol_addr:' ',
     sol_name:' ',
-    sol_exists:0
+    sol_exists:0,
+    sol_data:{}
 
 
   },
@@ -84,6 +85,11 @@ export default new Vuex.Store({
       }
   
     },
+
+    setReceiptData(state, payload) {
+      state.sol_data = { ...payload}  ;
+
+    }
 
   },
   getters: {

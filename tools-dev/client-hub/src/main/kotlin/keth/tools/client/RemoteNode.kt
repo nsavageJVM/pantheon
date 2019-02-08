@@ -28,10 +28,7 @@ import org.springframework.security.config.annotation.web.messaging.MessageSecur
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer
 import org.springframework.security.crypto.password.NoOpPasswordEncoder
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
@@ -96,6 +93,9 @@ class RestData {
 	@Autowired
 	lateinit var solOpps: ContractOperations
 
+	@Autowired
+	lateinit var simpleStorageOps: SimpleStorageOps
+
 
 
 	@RequestMapping( "/accts-data_path", method = arrayOf(RequestMethod.POST) )
@@ -133,29 +133,47 @@ class RestData {
 
 	 	val contract = solOpps.getDeployedContract(addr)
 
-
 		return Addresss(addr, contract.javaClass.simpleName)
 
 	}
 
 
+	// https://www.journaldev.com/3358/spring-requestmapping-requestparam-pathvariable-example
+	@RequestMapping( "/simple_storage_ops/{op} " )
+	fun runSimpleStorageOps( @PathVariable(value="op" ) op:String, @RequestParam("value")  value:String  ) {
+		if(!db.isInitialised) {
+			db.initDb()
+		}
 
-}
+		when(op) {
+			"set" -> {
+				simpleStorageOps.runSend(value.toLong())
+			}
+			"get" -> {
+				println("TO DO")
+				}
+			}
+		}
+	}
 
 
 
 @Controller
-class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider) {
+class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autowired private val storageOps: SimpleStorageOps) {
 
 	protected val mapper = jacksonObjectMapper()
 
 
     @Autowired
-	lateinit var  maDataMessages: SimpMessagingTemplate
+	lateinit var  mxDataMessages: SimpMessagingTemplate
+
+	@Autowired
+	lateinit var  receiptMessages: SimpMessagingTemplate
 
 	    init {
 			GlobalScope.launch {
-				val brodcastJob = mxDataProvider.broadCastMxInfo()
+				mxDataProvider.broadCastMxInfo()
+				storageOps.broadCastRecieptInfo()
 				delay(5000)
 				processMachineInfo(mxDataProvider.mxInfoChannel)
 			}
@@ -166,12 +184,25 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider) {
 	fun CoroutineScope.processMachineInfo(inStream: Channel<MachineInfoDTO>) = launch {
 
 		for (node in inStream) {
-			broadcast(node)
+			broadcastMxInfo(node)
 		}
 	}
 
-	suspend fun broadcast(dto: MachineInfoDTO) {
-		maDataMessages.convertAndSend("/topic/mx", mapper.writeValueAsString(dto));
+	fun CoroutineScope.processReceiptInfo(inStream: Channel<String>) = launch {
+
+		for (node in inStream) {
+			broadcastReceiptInfo(node)
+		}
+	}
+
+	suspend fun broadcastMxInfo(dto: MachineInfoDTO) {
+		mxDataMessages.convertAndSend("/topic/mx", mapper.writeValueAsString(dto));
+	}
+
+
+	/** already json */
+	suspend fun broadcastReceiptInfo(dto: String) {
+		receiptMessages.convertAndSend("/topic/receipt", mapper.writeValueAsString(dto) );
 	}
 }
 
@@ -184,7 +215,7 @@ class WebSocketAuthorizationSecurityConfig: AbstractSecurityWebSocketMessageBrok
 
 
 	override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-		registry.addEndpoint("/mx-data_path")
+		registry.addEndpoint("/mx-data_path","/receipt-data_path" )
 				.setAllowedOrigins("*").withSockJS();
 
 	}
@@ -195,7 +226,7 @@ class WebSocketAuthorizationSecurityConfig: AbstractSecurityWebSocketMessageBrok
 		// controller   @SendTo("/topic/xxxxx")
 		config.enableSimpleBroker("/topic");
 		// in sockjs send to  "/mx/endpoint") =>  hits @MessageMapping("/endpoint")
-		config.setApplicationDestinationPrefixes("/mx_in_path"); // base send path on js
+		config.setApplicationDestinationPrefixes("/mx_in_path", "/receipt_in_path"); // base send path on js
 	}
 
 
@@ -204,7 +235,8 @@ class WebSocketAuthorizationSecurityConfig: AbstractSecurityWebSocketMessageBrok
 		messages
 				.nullDestMatcher().permitAll()
 				.simpSubscribeDestMatchers("/topic/" + "**").permitAll()
-				.simpDestMatchers("/mx_in_path/**").permitAll();
+				.simpDestMatchers("/mx_in_path/**", "/receipt_in_path/**").permitAll();
+
 
 	}
 
@@ -239,8 +271,7 @@ class SecurityConfig: WebSecurityConfigurerAdapter() {
 				.antMatchers("/contract_addr").hasAnyRole("USER","ADMIN")
 				.antMatchers("/").hasAnyRole("USER","ADMIN")
 				.antMatchers("/index**").hasAnyRole("USER","ADMIN")
-				.antMatchers("**/mx-data_path/**").permitAll()
-
+				.antMatchers("**/mx-data_path/**", "/receipt_in_path/**").permitAll()
 				.and()
 				.exceptionHandling().accessDeniedPage("/tools/403.html");
 

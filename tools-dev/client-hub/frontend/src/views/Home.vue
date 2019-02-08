@@ -76,10 +76,11 @@ export default {
 
   data: function() {
     return {
-      // contracts_list: {
-      //   SimpleStorage: "0x4c6666106f61a85a7ca15b95e8c072b1ec902439",
-      //   StandardToken: "0x217c0a153fcfb74946b8a15f7b3de958b3ba310b"
-      // },
+      contracts_list: {
+        SimpleStorage: "0x4c6666106f61a85a7ca15b95e8c072b1ec902439",
+        StandardToken: "0x217c0a153fcfb74946b8a15f7b3de958b3ba310b"
+      },
+      // {transactionHash, blockHash, blockNumber, gasUsed, statusOK, from, to}
       // only used to select drop down default val
       contract_select: "",
       contract_address: "",
@@ -106,17 +107,17 @@ export default {
   computed: {
     num_contracts() {
       var storeData = this.$store.state.sol_exists;
-      return storeData;
-      // return 1;
+     // return storeData;
+       return 1;
     },
-    contracts_list() {
-      var sol_name =  this.$store.state.sol_name;
-      var sol_addr =  this.$store.state.sol_addr;
+    // contracts_list() {
+    //   var sol_name =  this.$store.state.sol_name;
+    //   var sol_addr =  this.$store.state.sol_addr;
 
-      var result = {};
-      result[sol_name] = sol_addr;
-      return result;
-    }
+    //   var result = {};
+    //   result[sol_name] = sol_addr;
+    //   return result;
+    // }
   }
 };
 </script>

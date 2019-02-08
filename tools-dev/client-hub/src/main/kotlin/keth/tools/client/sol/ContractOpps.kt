@@ -121,7 +121,6 @@ class ContractOperations : ContractBase() {
 
     fun getDeployedContract(c_addr:String): SimpleStorage {
 
-
         val simple = SimpleStorage
                 .load( c_addr, Web3j.build(HttpService()), getCredentials(), STATIC_GAS_PROVIDER)
         return simple
