@@ -102,7 +102,7 @@ export default {
 
   mounted: function () {
 
-    this.lib_createMxDataSocket();
+
     var call_timer = null
     let mssg = 
             this.$jsonRpcMessageProvider(

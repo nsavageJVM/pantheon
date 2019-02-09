@@ -23,7 +23,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class ContractData(val transactionHash:String, val blockHash:String, val blockNumber:String, val gasUsed:String, val statusOK:String, val from:String, val to:String )
+data class ContractData(val transactionHash: String, val blockHash: String, val blockNumber: String, val gasUsed: String, val statusOK: String, val from: String, val to: String)
 
 @Service
 class SimpleStorageOps {
@@ -32,7 +32,7 @@ class SimpleStorageOps {
 
     var tranReceiptChannel = Channel<ContractData>()
 
-    var queue = mutableListOf(ContractData("","","","","","",""))
+    var queue = mutableListOf(ContractData("", "", "", "", "", "", ""))
 
 
     @Autowired
@@ -69,11 +69,7 @@ class SimpleStorageOps {
     fun queueTransactionReciepts(r: TransactionReceipt) {
 
         val result = objectMapper.writeValueAsString(r)
-        println("SimpleStorageOps result::  ${result}")
-
-       val contractData = objectMapper.readValue(result, ContractData::class.java);
-
-        println("SimpleStorageOps contractData result::  ${contractData.toString()}")
+        val contractData = objectMapper.readValue(result, ContractData::class.java);
 
         queue.add(contractData)
 
@@ -83,6 +79,8 @@ class SimpleStorageOps {
 
         while (true) {
             if (queue.size > 0) {
+                val cData = queue.last();
+                println("produceRecieptInfo:   ${cData.toString()}")
                 send(queue.last())
                 queue.removeAt(queue.size - 1)
             }

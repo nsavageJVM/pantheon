@@ -84,6 +84,8 @@ class RestData {
 
 	class Addresss(var solAddr:String, var solName:String)
 
+	class OK(var response:String )
+
 	@Autowired
 	lateinit var constants: GlobalConstants
 
@@ -139,11 +141,12 @@ class RestData {
 
 
 	// https://www.journaldev.com/3358/spring-requestmapping-requestparam-pathvariable-example
-	@RequestMapping( "/simple_storage_ops/{op} " )
-	fun runSimpleStorageOps( @PathVariable(value="op" ) op:String, @RequestParam("value")  value:String  ) {
+	@RequestMapping( "/simple_storage_ops/{op}" )
+	fun runSimpleStorageOps( @PathVariable(value="op" ) op:String, @RequestParam("value")  value:String  ):OK {
 		if(!db.isInitialised) {
 			db.initDb()
 		}
+		simpleStorageOps.initVals()
 
 		when(op) {
 			"set" -> {
@@ -153,6 +156,8 @@ class RestData {
 				println("TO DO")
 				}
 			}
+		return OK("OK")
+
 		}
 	}
 
@@ -176,6 +181,7 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autow
 				storageOps.broadCastRecieptInfo()
 				delay(5000)
 				processMachineInfo(mxDataProvider.mxInfoChannel)
+				processReceiptInfo(storageOps.tranReceiptChannel)
 			}
 
     }
@@ -188,7 +194,7 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autow
 		}
 	}
 
-	fun CoroutineScope.processReceiptInfo(inStream: Channel<String>) = launch {
+	fun CoroutineScope.processReceiptInfo(inStream: Channel<ContractData>) = launch {
 
 		for (node in inStream) {
 			broadcastReceiptInfo(node)
@@ -201,7 +207,7 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autow
 
 
 	/** already json */
-	suspend fun broadcastReceiptInfo(dto: String) {
+	suspend fun broadcastReceiptInfo(dto: ContractData) {
 		receiptMessages.convertAndSend("/topic/receipt", mapper.writeValueAsString(dto) );
 	}
 }

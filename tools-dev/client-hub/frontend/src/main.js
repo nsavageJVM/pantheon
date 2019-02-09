@@ -44,6 +44,9 @@ Vue.component('apexchart', VueApexCharts)
 var WS_URI = "ws://localhost:8546";
 var HTTP_URI = "http://127.0.0.1:8545";
 
+
+
+
 // global functions 
 Vue.mixin( {
   methods: {
@@ -67,15 +70,15 @@ Vue.mixin( {
     },
 
     // mx data and callback code
-    lib_createMxDataSocket() {
-      console.log('lib_createMxDataSocket') 
+    lib_createDataSocket() {
+      console.log('lib_createDataSocket') 
 
       const ws = new SockJS("/mx-data_path");
       const stomp = Stomp.over(ws);
       const savedStore = this.$store;
    
       var token = $cookies.get('JSESSIONID') || 0;
-      console.log('lib_createMxDataSocket token as json:  '+JSON.stringify(token)   );
+      console.log('lib_createDataSocket token as json:  '+JSON.stringify(token)   );
         var headers = {
             Authorization : 'Bearer ' + token,
         };
@@ -83,6 +86,7 @@ Vue.mixin( {
       stomp.connect( {},
         frame => {
           this.connected = true;
+            console.log('lib_createDataSocket subscribe mx');
             stomp.subscribe("/topic/mx", tick => {
            //{mx_cpu, mx_mem_free, mx_mem_total, mx_db_size, mx_disk_free_space} 
             var mx_obj =  JSON.parse(  tick.body); 
@@ -95,50 +99,24 @@ Vue.mixin( {
             savedStore.commit('setMxData', payload);
      
           }, headers);
-        },
-        error => {
-          console.log(error);
-          this.connected = false;
-        }
-      ); // end connect
 
-      savedStore.commit('setMxStompClient', stomp);
-    },
-
-    // transaction  data and callback code
-    lib_createTransactionDataSocket() {
-      console.log('lib_createTransactionDataSocket') 
-
-      const ws = new SockJS("/receipt_in_path");
-      const stomp = Stomp.over(ws);
-      const savedStore = this.$store;
+          console.log('lib_createDataSocket subscribe receipt') 
+          stomp.subscribe("/topic/receipt", tick => {
+         // {transactionHash, blockHash, blockNumber, gasUsed, statusOK, from, to} 
+          savedStore.commit('setReceiptData', JSON.parse(tick.body));
+          console.log('lib_createTransactionDataSocket commit setReceiptData '+JSON.parse(tick.body)) 
+          savedStore.commit('setToggleForReciept');
    
-      var token = $cookies.get('JSESSIONID') || 0;
-      console.log('lib_createTransactionDataSocket token as json:  '+JSON.stringify(token)   );
-        var headers = {
-            Authorization : 'Bearer ' + token,
-        };
-
-      stomp.connect( {},
-        frame => {
-          this.connected = true;
-            stomp.subscribe("/topic/receipt", tick => {
-           // {transactionHash, blockHash, blockNumber, gasUsed, statusOK, from, to} 
-            savedStore.commit('setReceiptData', JSON.parse(tick.body));
-     
-          }, headers);
+        }, headers);
         },
         error => {
           console.log(error);
           this.connected = false;
         }
       ); // end connect
-
-      savedStore.commit('setMxStompClient', stomp);
+ 
     },
-
-
-
+ 
 
     lib_processJsonRpc(mssg) {
        // see lib_createJsonRpcApi for callback
@@ -195,9 +173,30 @@ Vue.mixin( {
           console.log(error);
       });
 
+    },
+
+    lib_runContractOpps(opp, payload) {
+ 
+      var token = $cookies.get('JSESSIONID') || 0;
+      console.log('lib_runContractOpps token as json:  '+JSON.stringify(token)   );
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+
+      if(opp === 'store') {
+
+        axios.get('/simple_storage_ops/set?value='+payload).then((response) => {
+        console.log('hoping transaction data bound to websocket'    );
+     
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+
+
+      }
+
+
     }
-
-
 
 
 } // end methods

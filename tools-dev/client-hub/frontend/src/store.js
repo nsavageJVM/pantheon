@@ -8,7 +8,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     // management(mx) bean
-    stomp_mx: null,
+ 
     // mx beans data
     mx_cpu: 0,
     mx_mem_free: 0,
@@ -29,7 +29,15 @@ export default new Vuex.Store({
     sol_addr:' ',
     sol_name:' ',
     sol_exists:0,
-    sol_data:{}
+    sol_data:{
+          "transactionHash":"",
+          "blockHash":"",
+          "blockNumber":0,
+          "gasUsed":0,
+          "statusOK":true,
+          "from":"",
+          "to":"" },
+    toggleForReciept:false
 
 
   },
@@ -39,15 +47,22 @@ export default new Vuex.Store({
       state.ws_jrpc = jrpc;
     },
 
-    setMxStompClient(state, stomp) {
-      state.stomp_mx = stomp;
-    }, 
-
     setMxData(state, payload ) {
       //{mx_cpu, mx_mem_free, mx_mem_total, mx_db_size, mx_disk_free_space} 
       state = Object.assign(state, payload)
     },
 
+
+    setReceiptData(state, payload) {
+      state.sol_data = { ...payload}  ;
+
+    },
+
+    setToggleForReciept(state ) {
+      state.toggleForReciept=true ;
+
+    },
+ 
     // json-rpc api
     setJsonRpcData(state, jrpc_data) {
       console.log("store "+ JSON.stringify(jrpc_data) );
@@ -85,11 +100,6 @@ export default new Vuex.Store({
       }
   
     },
-
-    setReceiptData(state, payload) {
-      state.sol_data = { ...payload}  ;
-
-    }
 
   },
   getters: {

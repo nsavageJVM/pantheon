@@ -60,6 +60,7 @@ export default {
   mounted() {
        this.lib_createJsonRpcApi();
        this.lib_searchContract();
+       this.lib_createDataSocket();
 
   },
   data: function() {
