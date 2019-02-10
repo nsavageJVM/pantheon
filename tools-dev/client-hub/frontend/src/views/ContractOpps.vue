@@ -1,4 +1,6 @@
 <template>
+<div>
+<ProgressModal :m_text="modal_text" ></ProgressModal>  
 <section class="home is-fullheight">
 <div class="columns is-fullheight flex-box" >
 
@@ -32,20 +34,25 @@
 
 </div>
 </section>
+</div>
 </template>
 
 <script>
 // @ is an alias to /src
+import ProgressModal from "@/components/ui/ProgressModal.vue";
 
 export default {
   name: 'contracts',
-
+  components: {
+    ProgressModal
+  },
   data:  function() {
     return { 
     //    accts_list : {
     //    'acct1': '0x4c6666106f61a85a7ca15b95e8c072b1ec902439',
     //    'acct2': '0x217c0a153fcfb74946b8a15f7b3de958b3ba310b',
     //    'acct3': '0x60874873b677db1422ad44f5f6f888d169ce2a78' }
+    modal_text:"Operation to deploy contract is  in progress"
 
      }
   },

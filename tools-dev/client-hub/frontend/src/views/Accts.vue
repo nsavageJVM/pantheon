@@ -1,4 +1,5 @@
 <template>
+  
 <div class="columns is-fullheight flex-box" >
  
     <div class="column is-4">
@@ -33,15 +34,13 @@
  
         </nav>
     </div>
- 
-</div>
+</div> 
 </template>
 
 <script>
-// @ is an alias to /src
+
 export default {
   name: 'accounts',
-
   data:  function() {
     return { 
         selected_acct:0

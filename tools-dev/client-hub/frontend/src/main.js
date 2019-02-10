@@ -149,6 +149,7 @@ Vue.mixin( {
       const savedStore = this.$store;
       const context = this;
       token();
+      savedStore.commit('setToggleForModal', true);
       axios.post('/deploy_contract').then((response) => {
         console.log('response.data ContractAddress:  '+ response.data.solAddr     );
         savedStore.commit('setContractAddress', response.data.solAddr);
@@ -167,6 +168,7 @@ Vue.mixin( {
       axios.post('/contract_addr').then((response) => {
         console.log('response.data ContractAddress:  '+ response.data.solAddr     );
         savedStore.commit('setContractAddress', response.data );
+        savedStore.commit('setToggleForModal', false);
       })
       .catch((error) => {
           console.log(error);
