@@ -38,12 +38,12 @@ library.add(
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('font-awesome-layers', FontAwesomeLayers)
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText)
-
 Vue.component('apexchart', VueApexCharts)
 
 var WS_URI = "ws://localhost:8546";
 var HTTP_URI = "http://127.0.0.1:8545";
 
+// axios headers for spring security
 var token = null;
 var headers = function () {
   var token = $cookies.get('JSESSIONID') || 0;
@@ -83,7 +83,7 @@ Vue.mixin({
 
     },
 
-    // mx data and callback code
+    // mx data and contract callback code
     lib_createDataSocket() {
       console.log('lib_createDataSocket')
 
@@ -112,7 +112,6 @@ Vue.mixin({
           stomp.subscribe("/topic/receipt", tick => {
             // {transactionHash, blockHash, blockNumber, gasUsed, statusOK, from, to} 
             savedStore.commit('setReceiptData', JSON.parse(tick.body));
-            console.log('lib_createTransactionDataSocket commit setReceiptData ' + JSON.parse(tick.body))
             savedStore.commit('setToggleForReciept');
             savedStore.commit('setToggleForModal', false);
 
@@ -122,7 +121,6 @@ Vue.mixin({
           stomp.subscribe("/topic/value", tick => {
             // {result} 
             savedStore.commit('setValueData', JSON.parse(tick.body));
-            console.log('lib_createValueDataSocket commit setValueData ' + JSON.parse(tick.body))
             savedStore.commit('setToggleForValue');
             savedStore.commit('setToggleForModal', false);
 
@@ -185,7 +183,7 @@ Vue.mixin({
           console.log(error);
         });
     },
-
+    // see lib_createDataSocket for callbacks
     lib_runContractOpps(opp, payload) {
       token();
 
@@ -193,34 +191,19 @@ Vue.mixin({
       savedStore.commit('setToggleForModal', true);
       if (opp === 'store') {
         axios.get('/simple_storage_ops/set?value=' + payload).then((response) => {
-          console.log('hoping transaction data bound to websocket');
-        })
-
-
-          .catch((error) => {
+        }).catch((error) => {
             console.log(error);
           });
       }
 
       if (opp === 'get') {
         axios.get('/simple_storage_ops/get?value=0').then((response) => {
-          console.log('hoping transaction data bound to websocket');
-        })
-
-
-          .catch((error) => {
+        }) .catch((error) => {
             console.log(error);
           });
       }
 
-
-
-
-
-
     }
-
-
   } // end methods
 
 }); // end mix in

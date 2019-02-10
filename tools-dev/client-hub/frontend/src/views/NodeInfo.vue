@@ -100,9 +100,7 @@ export default {
     }
   },
 
-  mounted: function () {
-
-
+mounted: function () {
     var call_timer = null
     let mssg = 
             this.$jsonRpcMessageProvider(
@@ -125,12 +123,12 @@ export default {
         function() { context.lib_processJsonRpc(mssg) }, 7500)
     },
 
-  created() {
+created() {
 
 
   },
 
-  computed: {
+computed: {
 
       //mx bean data  {  mx_mem_total, mx_db_size, mx_disk_free_space} 
     mx_cpu() {

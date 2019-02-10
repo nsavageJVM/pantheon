@@ -172,9 +172,7 @@ export default {
       return storeData;
       }  
     },
-
   };
- 
 </script>
 
 <style >

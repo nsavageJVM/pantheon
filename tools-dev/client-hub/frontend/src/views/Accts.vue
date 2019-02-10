@@ -79,7 +79,7 @@ export default {
       }
     },
 
-   computed: {
+  computed: {
 
     accts_list() {
         var storeData =  this.$store.state.accts;
@@ -90,13 +90,7 @@ export default {
         var storeData =  this.$store.state.accts_bal_query_result;
         return storeData;  
         },
-
-    // selected_acct() {
-        
-    //     return 0;  
-    //     }
     }
-
 
 }
 </script>

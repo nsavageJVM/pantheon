@@ -13,9 +13,8 @@
                Deploy Contract</a>
            </div>
            <div  v-if= "sol_exists === 1" style="position:relative;float:left;padding:10px 0 0 10px;"  >
-            <a class="button is-success" style="display:block;margin:10px 0 0 10px;">
-               Deployed Contract Exists</a>
- 
+           <router-link to="/" class="button is-success" style="display:block;margin:10px 0 0 10px;">Deployed Contract Operations
+           </router-link>
           </div>
       </nav>   
    </div>
@@ -57,7 +56,7 @@ export default {
      }
   },
 
-    beforeMount () {
+  beforeMount () {
       var solVal =  this.$store.state.sol_exists; 
       this.$data.sol_exists = solVal; 
       
@@ -67,7 +66,7 @@ export default {
   },
   
    
-   computed: {  
+  computed: {  
       
       address() {
         var storeData =  this.$store.state.sol_addr;
@@ -81,7 +80,7 @@ export default {
         // return 1;
         },
    },
-   methods: {
+  methods: {
       deployContract: function( ) {
         // this.$store.state.sol_addr = '0x60874873b677db1422ad44f5f6f888d169ce2a78';
          this.lib_deployContract();

@@ -28,7 +28,7 @@ export default {
     };
   },
 
-    methods: {
+  methods: {
       runShowToolTip: function(toggle ) {
         if(toggle) {
           this.showToolTip = true;
