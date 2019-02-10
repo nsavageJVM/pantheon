@@ -104,7 +104,7 @@ import ToolTipLabel  from "@/components/ui/ToolTipLabel.vue"
 
 export default {
   name: "SimpleStorage",
-    props: {
+  props: {
     value: String
  
   },
