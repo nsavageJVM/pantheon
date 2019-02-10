@@ -37,7 +37,8 @@ export default new Vuex.Store({
           "statusOK":true,
           "from":"",
           "to":"" },
-    toggleForReciept:false
+    toggleForReciept:false,
+    show_modal:false
 
 
   },
@@ -59,7 +60,12 @@ export default new Vuex.Store({
     },
 
     setToggleForReciept(state ) {
-      state.toggleForReciept=true ;
+      state.toggleForReciept=!state.toggleForReciept ;
+   
+
+    },
+    setToggleForModal(state, toggle ) {
+      state.show_modal = toggle;
 
     },
  

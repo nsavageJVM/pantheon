@@ -7,7 +7,7 @@
             <div class="field-body has-text-grey">{{value}}</div>
           </div>
 
-          <div  v-if="!toggleForReciept" class="field is-horizontal is-grouped">
+         <div  v-if="!toggleForReciept" class="field is-horizontal is-grouped">
             <div class="field-label has-text-grey" style="max-width:110px;">Operations</div>
             <div class="field has-addons has-addons-right">
                 <p class="control">
@@ -17,8 +17,9 @@
                     <a class="button is-primary" v-on:click="runSimpleStorage('store')"  style="margin:0 20px 0 0;">Send</a> 
                 </p>
             </div>
+
             <a class="button is-info">Get</a> 
-          </div>
+         </div><!--end !toggleForReciept -->
 
           <div  v-if="toggleForReciept">
 
@@ -91,8 +92,10 @@
                       </p>  
                   
             </div>
-          </div>
-    </div>
+            <a class="button is-primary" v-on:click="runReturnOps( )">Back to contract Operations</a>
+          </div>><!--end toggleForReciept -->
+
+    </div><!--end is-12 -->
   </div> 
 </template>
 
@@ -119,7 +122,12 @@ export default {
  
         this.lib_runContractOpps(opp, this.amount);
 
-        }
+        },
+
+    runReturnOps: function() {
+     this.toggleForReciept = false;
+     this.$store.commit('setToggleForReciept');
+    }
   },
 
   computed:  { 

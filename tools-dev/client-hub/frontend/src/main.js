@@ -44,7 +44,21 @@ Vue.component('apexchart', VueApexCharts)
 var WS_URI = "ws://localhost:8546";
 var HTTP_URI = "http://127.0.0.1:8545";
 
+var token = null;
+var headers =function() {
+  var token = $cookies.get('JSESSIONID') || 0;
+  console.log('lib_createDataSocket token as json:  '+JSON.stringify(token)   );
+    var headers = {
+        Authorization : 'Bearer ' + token,
+    };
+  return  headers;
+} 
 
+var token = function() {
+  var token = $cookies.get('JSESSIONID') || 0;
+  console.log('lib_getAccount token as json:  '+JSON.stringify(token)   );
+  axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+}
 
 
 // global functions 
@@ -76,13 +90,7 @@ Vue.mixin( {
       const ws = new SockJS("/mx-data_path");
       const stomp = Stomp.over(ws);
       const savedStore = this.$store;
-   
-      var token = $cookies.get('JSESSIONID') || 0;
-      console.log('lib_createDataSocket token as json:  '+JSON.stringify(token)   );
-        var headers = {
-            Authorization : 'Bearer ' + token,
-        };
-
+ 
       stomp.connect( {},
         frame => {
           this.connected = true;
@@ -98,7 +106,7 @@ Vue.mixin( {
             payload.mx_disk_free_space =  Math.trunc(mx_obj.freeSpace);   
             savedStore.commit('setMxData', payload);
      
-          }, headers);
+          }, headers());
 
           console.log('lib_createDataSocket subscribe receipt') 
           stomp.subscribe("/topic/receipt", tick => {
@@ -106,8 +114,9 @@ Vue.mixin( {
           savedStore.commit('setReceiptData', JSON.parse(tick.body));
           console.log('lib_createTransactionDataSocket commit setReceiptData '+JSON.parse(tick.body)) 
           savedStore.commit('setToggleForReciept');
+          savedStore.commit('setToggleForModal', false);
    
-        }, headers);
+        }, headers());
         },
         error => {
           console.log(error);
@@ -117,7 +126,6 @@ Vue.mixin( {
  
     },
  
-
     lib_processJsonRpc(mssg) {
        // see lib_createJsonRpcApi for callback
         this.$store.state.ws_jrpc.send(JSON.stringify(mssg));
@@ -126,10 +134,7 @@ Vue.mixin( {
 
     lib_getAllAccounts() {
       const savedStore = this.$store;
-      var token = $cookies.get('JSESSIONID') || 0;
-      console.log('lib_getAccount token as json:  '+JSON.stringify(token)   );
- 
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      token();
       axios.post('/accts-data_path').then((response) => {
         console.log('response.data acct1:  '+ response.data.acct1     );
         savedStore.commit('setAccounts', response.data);
@@ -143,10 +148,7 @@ Vue.mixin( {
     lib_deployContract() {
       const savedStore = this.$store;
       const context = this;
-      var token = $cookies.get('JSESSIONID') || 0;
-      console.log('lib_deployContract token as json:  '+JSON.stringify(token)   );
- 
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      token();
       axios.post('/deploy_contract').then((response) => {
         console.log('response.data ContractAddress:  '+ response.data.solAddr     );
         savedStore.commit('setContractAddress', response.data.solAddr);
@@ -161,10 +163,7 @@ Vue.mixin( {
 
     lib_searchContract() {
       const savedStore = this.$store;
-      var token = $cookies.get('JSESSIONID') || 0;
-      console.log('lib_searchContract token as json:  '+JSON.stringify(token)   );
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-
+      token();
       axios.post('/contract_addr').then((response) => {
         console.log('response.data ContractAddress:  '+ response.data.solAddr     );
         savedStore.commit('setContractAddress', response.data );
@@ -172,30 +171,21 @@ Vue.mixin( {
       .catch((error) => {
           console.log(error);
       });
-
     },
 
     lib_runContractOpps(opp, payload) {
+      token();
  
-      var token = $cookies.get('JSESSIONID') || 0;
-      console.log('lib_runContractOpps token as json:  '+JSON.stringify(token)   );
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-
+      const savedStore = this.$store;
+      savedStore.commit('setToggleForModal', true);
       if(opp === 'store') {
-
         axios.get('/simple_storage_ops/set?value='+payload).then((response) => {
         console.log('hoping transaction data bound to websocket'    );
-     
         })
         .catch((error) => {
             console.log(error);
         });
-
-
-
       }
-
-
     }
 
 
