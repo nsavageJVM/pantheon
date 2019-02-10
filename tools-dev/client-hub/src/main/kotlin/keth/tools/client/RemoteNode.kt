@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect
+import java.math.BigInteger
 import java.util.*
 
 
@@ -153,7 +154,7 @@ class RestData {
 				simpleStorageOps.runSend(value.toLong())
 			}
 			"get" -> {
-				println("TO DO")
+				simpleStorageOps.runGet( )
 				}
 			}
 		return OK("OK")
@@ -168,6 +169,8 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autow
 
 	protected val mapper = jacksonObjectMapper()
 
+	data class Payload(var result:String)
+
 
     @Autowired
 	lateinit var  mxDataMessages: SimpMessagingTemplate
@@ -175,13 +178,17 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autow
 	@Autowired
 	lateinit var  receiptMessages: SimpMessagingTemplate
 
+	@Autowired
+	lateinit var  valueMessages: SimpMessagingTemplate
+
 	    init {
 			GlobalScope.launch {
 				mxDataProvider.broadCastMxInfo()
-				storageOps.broadCastRecieptInfo()
+				storageOps.broadCastContractInfo()
 				delay(5000)
 				processMachineInfo(mxDataProvider.mxInfoChannel)
 				processReceiptInfo(storageOps.tranReceiptChannel)
+				processValueInfo(storageOps.transValueChannel)
 			}
 
     }
@@ -201,6 +208,13 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autow
 		}
 	}
 
+	fun CoroutineScope.processValueInfo(inStream: Channel<BigInteger>) = launch {
+
+		for (node in inStream) {
+			broadcastValueInfo(node)
+		}
+	}
+
 	suspend fun broadcastMxInfo(dto: MachineInfoDTO) {
 		mxDataMessages.convertAndSend("/topic/mx", mapper.writeValueAsString(dto));
 	}
@@ -210,6 +224,14 @@ class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autow
 	suspend fun broadcastReceiptInfo(dto: ContractData) {
 		receiptMessages.convertAndSend("/topic/receipt", mapper.writeValueAsString(dto) );
 	}
+
+	/** already json */
+	suspend fun broadcastValueInfo(value: BigInteger) {
+		val dto =Payload(value.toString())
+		receiptMessages.convertAndSend("/topic/value", mapper.writeValueAsString(dto) );
+	}
+
+
 }
 
 

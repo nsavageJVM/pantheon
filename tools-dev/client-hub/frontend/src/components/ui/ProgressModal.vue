@@ -85,7 +85,6 @@ export default {
       }
       context.prog_done =  context.prog_done + chunk;
       context.prog_modify = context.prog_total - context.prog_done;
-       console.debug("done: "+ context.prog_done+"  modify: "+ context.prog_modify) 
       },1000);
       }
   },

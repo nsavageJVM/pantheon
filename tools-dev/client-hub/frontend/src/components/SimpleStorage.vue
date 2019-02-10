@@ -7,7 +7,7 @@
             <div class="field-body has-text-grey">{{value}}</div>
           </div>
 
-         <div  v-if="!toggleForReciept" class="field is-horizontal is-grouped">
+         <div  v-if="!toggleForReciept && !toggleForValue" class="field is-horizontal is-grouped">
             <div class="field-label has-text-grey" style="max-width:110px;">Operations</div>
             <div class="field has-addons has-addons-right">
                 <p class="control">
@@ -18,7 +18,7 @@
                 </p>
             </div>
 
-            <a class="button is-info">Get</a> 
+            <a class="button is-info" v-on:click="runSimpleStorage('get')" >Get</a> 
          </div><!--end !toggleForReciept -->
 
           <div  v-if="toggleForReciept">
@@ -92,8 +92,20 @@
                       </p>  
                   
             </div>
-            <a class="button is-primary" v-on:click="runReturnOps( )">Back to contract Operations</a>
+            <a class="button is-primary" v-on:click="runReturnOpsFromReceipt( )">Back to contract Operations</a>
           </div>><!--end toggleForReciept -->
+
+          <div v-if="toggleForValue ">
+                <div class="field has-addons">
+                      <p class="control">
+                          <a class="button is-primary"  style="margin:0 20px 0 0;">Storage Value</a> 
+                      </p>         
+                      <p class="control">
+                          <ToolTipLabel :value ="sol_value" />
+                      </p>
+                  </div>
+              <a class="button is-primary" v-on:click="runReturnOpsFromValue( )">Back to contract Operations</a>
+          </div>><!--end toggleForValue  -->
 
     </div><!--end is-12 -->
   </div> 
@@ -124,9 +136,15 @@ export default {
 
         },
 
-    runReturnOps: function() {
-     this.toggleForReciept = false;
+    runReturnOpsFromReceipt: function() {
+ 
      this.$store.commit('setToggleForReciept');
+ 
+    },
+    
+    runReturnOpsFromValue: function() {
+ 
+     this.$store.commit('setToggleForValue');
     }
   },
 
@@ -137,13 +155,24 @@ export default {
       console.debug("storeData "+storeData);
       return storeData;
     },
+
+    sol_value: function()  {
+      var storeData = this.$store.state.sol_value;
+      console.debug("storeData "+storeData);
+      return storeData;
+    },
     
     toggleForReciept: function()  {
       var storeData = this.$store.state.toggleForReciept;
       return storeData;
-      }
+      },
+        
+    toggleForValue: function()  {
+      var storeData = this.$store.state.toggleForValue;
+      return storeData;
+      }  
     },
-    
+
   };
  
 </script>

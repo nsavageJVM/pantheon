@@ -3,9 +3,7 @@ package keth.tools.client
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import keth.tools.client.db.DbManager
-import keth.tools.client.mx.MachineInfoDTO
 import keth.tools.client.sol.ContractOperations
 import keth.tools.wrappers.SimpleStorage
 import kotlinx.coroutines.CoroutineScope
@@ -31,9 +29,10 @@ class SimpleStorageOps {
     val objectMapper = jacksonObjectMapper()
 
     var tranReceiptChannel = Channel<ContractData>()
+    var transValueChannel = Channel<BigInteger>()
 
     var queue = mutableListOf(ContractData("", "", "", "", "", "", ""))
-
+    var queueValue = mutableListOf(BigInteger.ZERO)
 
     @Autowired
     lateinit var contractOps: ContractOperations
@@ -54,8 +53,14 @@ class SimpleStorageOps {
 
     }
 
-    fun broadCastRecieptInfo() = GlobalScope.launch {
-        broadCast(produceRecieptInfo())
+    fun broadCastContractInfo() = GlobalScope.launch {
+        broadCastForReceipts(produceReceiptInfo())
+        broadCastForValues(produceValueInfo())
+    }
+
+    fun runGet() {
+      val result =  contract.get()
+      result.flowable().subscribe { s -> queueValue.add(s)}
     }
 
 
@@ -75,12 +80,12 @@ class SimpleStorageOps {
 
     }
 
-    fun CoroutineScope.produceRecieptInfo() = produce<ContractData> {
+    fun CoroutineScope.produceReceiptInfo() = produce<ContractData> {
 
         while (true) {
             if (queue.size > 0) {
                 val cData = queue.last();
-                println("produceRecieptInfo:   ${cData.toString()}")
+                println("produceReceiptInfo:   ${cData.toString()}")
                 send(queue.last())
                 queue.removeAt(queue.size - 1)
             }
@@ -88,7 +93,22 @@ class SimpleStorageOps {
         }
     }
 
-    fun CoroutineScope.broadCast(channel: ReceiveChannel<ContractData>) = launch {
+    fun CoroutineScope.produceValueInfo() = produce<BigInteger> {
+
+        while (true) {
+            if (queueValue.size > 0) {
+                val cData = queueValue.last();
+                println("produceReceiptInfo:   ${cData.toString()}")
+                send(queueValue.last())
+                queueValue.removeAt(queueValue.size - 1)
+            }
+            delay(5000L)
+        }
+    }
+
+
+
+    fun CoroutineScope.broadCastForReceipts(channel: ReceiveChannel<ContractData>) = launch {
 
         for (node in channel) {
             tranReceiptChannel.send(node)
@@ -96,5 +116,11 @@ class SimpleStorageOps {
 
     }
 
+    fun CoroutineScope.broadCastForValues(channel: ReceiveChannel<BigInteger>) = launch {
 
+        for (node in channel) {
+            transValueChannel.send(node)
+        }
+
+    }
 }

@@ -37,7 +37,9 @@ export default new Vuex.Store({
           "statusOK":true,
           "from":"",
           "to":"" },
+    sol_value:'',
     toggleForReciept:false,
+    toggleForValue:false,
     show_modal:false
 
 
@@ -53,17 +55,24 @@ export default new Vuex.Store({
       state = Object.assign(state, payload)
     },
 
-
     setReceiptData(state, payload) {
       state.sol_data = { ...payload}  ;
 
     },
 
-    setToggleForReciept(state ) {
-      state.toggleForReciept=!state.toggleForReciept ;
-   
+    setValueData(state, payload) {
+      state.sol_value = payload;
 
     },
+
+    setToggleForReciept(state ) {
+      state.toggleForReciept=!state.toggleForReciept ;
+    },
+
+    setToggleForValue(state ) {
+      state.toggleForValue=!state.toggleForValue ;
+    },
+
     setToggleForModal(state, toggle ) {
       state.show_modal = toggle;
 
