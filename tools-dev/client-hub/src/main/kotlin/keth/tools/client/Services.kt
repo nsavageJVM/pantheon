@@ -4,7 +4,9 @@ package keth.tools.client
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.client.db.DbManager
-import keth.tools.client.sol.ContractOperations
+import keth.tools.client.sol.PowerBudgetTokenCodeGen
+import keth.tools.client.sol.SimpleStorageCodeGen
+import keth.tools.wrappers.PowerBudgetToken
 import keth.tools.wrappers.SimpleStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -24,7 +26,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt
 data class ContractData(val transactionHash: String, val blockHash: String, val blockNumber: String, val gasUsed: String, val statusOK: String, val from: String, val to: String)
 
 @Service
-class SimpleStorageOps {
+class ContractOps {
 
     val objectMapper = jacksonObjectMapper()
 
@@ -35,7 +37,10 @@ class SimpleStorageOps {
     var queueValue = mutableListOf(BigInteger.ZERO)
 
     @Autowired
-    lateinit var contractOps: ContractOperations
+    lateinit var simpleStoreCodeGen: SimpleStorageCodeGen
+
+    @Autowired
+    lateinit var powerBudgetTokCodeGen: PowerBudgetTokenCodeGen
 
     @Autowired
     lateinit var db: DbManager
@@ -44,12 +49,18 @@ class SimpleStorageOps {
     lateinit var constants: GlobalConstants
 
 
-    lateinit var contract: SimpleStorage
-    lateinit var contractAddr: String
+    lateinit var simpleStorageContract: SimpleStorage
+    lateinit var simpleStoreAddr: String
+
+    lateinit var powerBudgetTokenContract: PowerBudgetToken
+    lateinit var powerBudgetTokenAddr: String
 
     fun initVals() {
-        contractAddr = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY)
-        contract = contractOps.getDeployedContract(contractAddr)
+        simpleStoreAddr = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY_SIMPLE)
+        powerBudgetTokenAddr = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY_POWER)
+
+        simpleStorageContract = simpleStoreCodeGen.getDeployedContract(simpleStoreAddr)
+        powerBudgetTokenContract = powerBudgetTokCodeGen.getDeployedContract(powerBudgetTokenAddr)
 
     }
 
@@ -58,15 +69,18 @@ class SimpleStorageOps {
         broadCastForValues(produceValueInfo())
     }
 
+    /**
+     *  Contract functions
+     */
     fun runGet() {
-      val result =  contract.get()
+      val result =  simpleStorageContract.get()
       result.flowable().subscribe { s -> queueValue.add(s)}
     }
 
 
     fun runSend(amt: Long) {
 
-        val recipt = contract.set(BigInteger.valueOf(amt))
+        val recipt = simpleStorageContract.set(BigInteger.valueOf(amt))
         recipt.flowable().subscribe { s -> queueTransactionReciepts(s) }
 
     }

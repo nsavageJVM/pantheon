@@ -1,7 +1,7 @@
 package keth.tools.client.sol
 
 import keth.tools.client.GlobalConstants
-import keth.tools.client.SimpleStorageOps
+import keth.tools.client.ContractOps
 import keth.tools.client.db.DbManager
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,45 +18,67 @@ class ClientHubSolTests {
     @Autowired
     lateinit var constants: GlobalConstants
 
-
-    @Autowired
-    lateinit var solOpps: ContractOperations
-
     @Autowired
     lateinit var db: DbManager
 
+    @Autowired
+    lateinit var simpleStoreCodeGen: SimpleStorageCodeGen
 
     @Autowired
-    lateinit var simpleStorageOps: SimpleStorageOps
+    lateinit var contractOps: ContractOps
+
+
+    @Autowired
+    lateinit var powerBudgetTokCodeGen: PowerBudgetTokenCodeGen
 
     @Test
     fun solConfigTest() {
 
-        println(solOpps.abiDirPath.toUri())
-        println(solOpps.abiDirOutPath.toUri())
+        println(simpleStoreCodeGen.abiDirPath.toUri())
+        println(simpleStoreCodeGen.abiDirOutPath.toUri())
     }
 
     @Test
-    fun solWrapperTest() {
-        solOpps.generateWrapper()
+    fun simpleStorageWrapperTest() {
+        simpleStoreCodeGen.generateWrapper()
 
     }
 
+
     @Test
-    fun solDeployTest() {
+    fun powerBudgetTokenWrapperTest() {
+        powerBudgetTokCodeGen.generateWrapper()
+
+    }
+
+
+
+    @Test
+    fun simpleStorageDeployTest() {
 
         db.initDb()
 
-        val address = solOpps.deployContract()
+        val address = simpleStoreCodeGen.deployContract()
         println(address)
 
     }
 
     @Test
+    fun powerBudgetTokenDeployTest() {
+
+        db.initDb()
+
+        val address = powerBudgetTokCodeGen.deployContract()
+        println(address)
+
+    }
+
+
+    @Test
     fun solGetContractAddressTest() {
 
         db.initDb()
-        val result = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY)
+        val result = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY_SIMPLE)
         println(result)
     }
 
@@ -64,8 +86,8 @@ class ClientHubSolTests {
     fun solRunContractFuncTest() {
        val holder = CountDownLatch(1)
         db.initDb()
-        simpleStorageOps. initVals()
-        val result = simpleStorageOps.runSend(20170000000000000)
+        contractOps. initVals()
+        val result = contractOps.runSend(20170000000000000)
         println("solRunContractFuncTest result: ${result}"   )
 
         holder.await()

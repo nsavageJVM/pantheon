@@ -94,19 +94,19 @@ Vue.mixin({
       stomp.connect({},
         frame => {
           this.connected = true;
-          console.log('lib_createDataSocket subscribe mx');
-          stomp.subscribe("/topic/mx", tick => {
-            //{mx_cpu, mx_mem_free, mx_mem_total, mx_db_size, mx_disk_free_space} 
-            var mx_obj = JSON.parse(tick.body);
-            var payload = {};
-            payload.mx_cpu = Math.trunc(mx_obj.cpuUsage);
-            payload.mx_mem_free = Math.trunc(mx_obj.memoryFree);
-            payload.mx_mem_total = Math.trunc(mx_obj.memoryTotal);
-            payload.mx_db_size = Math.trunc(mx_obj.dbSize);
-            payload.mx_disk_free_space = Math.trunc(mx_obj.freeSpace);
-            savedStore.commit('setMxData', payload);
+          // console.log('lib_createDataSocket subscribe mx');
+          // stomp.subscribe("/topic/mx", tick => {
+          //   //{mx_cpu, mx_mem_free, mx_mem_total, mx_db_size, mx_disk_free_space} 
+          //   var mx_obj = JSON.parse(tick.body);
+          //   var payload = {};
+          //   payload.mx_cpu = Math.trunc(mx_obj.cpuUsage);
+          //   payload.mx_mem_free = Math.trunc(mx_obj.memoryFree);
+          //   payload.mx_mem_total = Math.trunc(mx_obj.memoryTotal);
+          //   payload.mx_db_size = Math.trunc(mx_obj.dbSize);
+          //   payload.mx_disk_free_space = Math.trunc(mx_obj.freeSpace);
+          //   savedStore.commit('setMxData', payload);
 
-          }, headers());
+          // }, headers());
 
           console.log('lib_createDataSocket subscribe receipt')
           stomp.subscribe("/topic/receipt", tick => {
@@ -154,16 +154,20 @@ Vue.mixin({
 
     },
 
-    lib_deployContract() {
+    lib_deployContract(option) {
+      console.log('lib_deployContract option: ' + option);
       const savedStore = this.$store;
-      const context = this;
       token();
+
+      // start the modal
       savedStore.commit('setToggleForModal', true);
-      axios.post('/deploy_contract').then((response) => {
+
+      axios.post('/deploy_contract/'+option).then((response) => {
         console.log('response.data ContractAddress:  ' + response.data.solAddr);
-        savedStore.commit('setContractAddress', response.data.solAddr);
-        // look in db for contract name to update view
-        context.lib_searchContract();
+        // solAddr has addr and name
+        console.debug("lib_deployContract calls back:  "+JSON.stringify(response.data) );
+        savedStore.commit('setContractAddressFromDeploy', response.data );
+        savedStore.commit('setToggleForModal', false);
       })
         .catch((error) => {
           console.log(error);
@@ -175,9 +179,8 @@ Vue.mixin({
       const savedStore = this.$store;
       token();
       axios.post('/contract_addr').then((response) => {
-        console.log('response.data ContractAddress:  ' + response.data.solAddr);
-        savedStore.commit('setContractAddress', response.data);
-        savedStore.commit('setToggleForModal', false);
+        console.debug("lib_searchContract calls back:  "+JSON.stringify(response.data) );
+        savedStore.commit('setContractAddress', response.data );
       })
         .catch((error) => {
           console.log(error);

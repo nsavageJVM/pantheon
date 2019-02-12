@@ -5,12 +5,16 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.client.db.DbManager
 import keth.tools.client.mx.MachineInfoDTO
 import keth.tools.client.mx.MxDataProvider
-import keth.tools.client.sol.ContractOperations
+import keth.tools.client.sol.Address
+import keth.tools.client.sol.PowerBudgetTokenCodeGen
+import keth.tools.client.sol.SimpleStorageCodeGen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -81,9 +85,11 @@ class Dispatcher {
 @RestController
 class RestData {
 
+	val logger: Logger = LoggerFactory.getLogger(RestData::class.simpleName)
+
 	class Accounts(var acct1:String, var acct2:String, var acct3:String)
 
-	class Addresss(var solAddr:String, var solName:String)
+
 
 	class OK(var response:String )
 
@@ -94,11 +100,13 @@ class RestData {
 	lateinit var db: DbManager
 
 	@Autowired
-	lateinit var solOpps: ContractOperations
+	lateinit var simpleStoreCodeGen: SimpleStorageCodeGen
 
 	@Autowired
-	lateinit var simpleStorageOps: SimpleStorageOps
+	lateinit var powerBudgetTokenCodeGen: PowerBudgetTokenCodeGen
 
+	@Autowired
+	lateinit var contractOps: ContractOps
 
 
 	@RequestMapping( "/accts-data_path", method = arrayOf(RequestMethod.POST) )
@@ -113,31 +121,55 @@ class RestData {
 
 	}
 
-	@RequestMapping( "/deploy_contract", method = arrayOf(RequestMethod.POST) )
-	fun deployContract( ) : Addresss  {
+	@RequestMapping( "/deploy_contract/{option}", method = arrayOf(RequestMethod.POST) )
+	fun deployContract(@PathVariable(value="option" ) option:String ) : Address {
 		if(!db.isInitialised) {
 			db.initDb()
 		}
-		return Addresss(solOpps.deployContract(), " ")
+		logger.debug("deployContract  ${option}")
+
+		var addr:Address?= null
+ 		when(option) {
+			"1" -> {
+			 addr=	simpleStoreCodeGen.deployContract()
+				logger.debug("deployContract 1 ${addr}")
+			}
+			"2" -> {
+			  addr=	powerBudgetTokenCodeGen.deployContract()
+				logger.debug("deployContract 2 ${addr}")
+			}
+		}
+		return addr!!
 	}
 
 
 	@RequestMapping( "/contract_addr", method = arrayOf(RequestMethod.POST) )
-	fun getContractAddress( ) : Addresss  {
+	fun getContractAddress() : MutableList<Address> {
 		if(!db.isInitialised) {
 			db.initDb()
 		}
 
-		val addr = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY)
+		val contracts= mutableListOf<Address>();
 
-		if(addr.equals(constants.NULL_CONTRACT_ADDRESS_VALUE)) {
-			return	Addresss(addr, constants.NULL_CONTRACT_ADDRESS_VALUE)
+		// simple
+		val addrSimple = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY_SIMPLE)
+
+		if(addrSimple.equals(constants.NULL_CONTRACT_ADDRESS_VALUE)) {
+			contracts.add(Address(addrSimple, constants.NULL_CONTRACT_ADDRESS_VALUE))
+		} else {
+			val contract = simpleStoreCodeGen.getDeployedContract(addrSimple)
+			contracts.add(Address(addrSimple, contract.javaClass.simpleName))
+		}
+		val addrPower = db.getContractAddress(constants.CONTRACT_ADDRESS_KEY_POWER)
+
+		if(addrPower.equals(constants.NULL_CONTRACT_ADDRESS_VALUE)) {
+			contracts.add(Address(addrPower, constants.NULL_CONTRACT_ADDRESS_VALUE))
+		} else {
+			val contract = powerBudgetTokenCodeGen.getDeployedContract(addrPower)
+			contracts.add(Address(addrPower, contract.javaClass.simpleName))
 		}
 
-	 	val contract = solOpps.getDeployedContract(addr)
-
-		return Addresss(addr, contract.javaClass.simpleName)
-
+		return contracts
 	}
 
 
@@ -147,14 +179,14 @@ class RestData {
 		if(!db.isInitialised) {
 			db.initDb()
 		}
-		simpleStorageOps.initVals()
+		contractOps.initVals()
 
 		when(op) {
 			"set" -> {
-				simpleStorageOps.runSend(value.toLong())
+				contractOps.runSend(value.toLong())
 			}
 			"get" -> {
-				simpleStorageOps.runGet( )
+				contractOps.runGet( )
 				}
 			}
 		return OK("OK")
@@ -165,7 +197,7 @@ class RestData {
 
 
 @Controller
-class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autowired private val storageOps: SimpleStorageOps) {
+class WsDispatcher(@Autowired private val mxDataProvider: MxDataProvider, @Autowired private val storageOps: ContractOps) {
 
 	protected val mapper = jacksonObjectMapper()
 

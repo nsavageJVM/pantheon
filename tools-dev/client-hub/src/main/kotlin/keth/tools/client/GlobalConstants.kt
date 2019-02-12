@@ -26,7 +26,8 @@ class GlobalConstants {
     val SOL_PATH =  CHAIN_BASE_PATH.resolve("sol")
     val BOOT_NODE_PATH = CHAIN_BASE_PATH.resolve("node1/cdata")
 
-    val CONTRACT_ADDRESS_KEY="c_addres"
+    val CONTRACT_ADDRESS_KEY_SIMPLE="s_addres"
+    val CONTRACT_ADDRESS_KEY_POWER="p_addres"
     val NULL_CONTRACT_ADDRESS_VALUE="empty"
 
 

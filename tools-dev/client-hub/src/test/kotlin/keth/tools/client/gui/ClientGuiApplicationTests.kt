@@ -3,6 +3,7 @@ package keth.tools.client.gui
 import io.rsocket.kotlin.DefaultPayload
 import io.rsocket.kotlin.RSocketFactory
 import io.rsocket.kotlin.transport.netty.client.WebsocketClientTransport
+import keth.tools.client.RestData
 
 import keth.tools.client.mx.MachineInfoDTO
 import keth.tools.client.mx.MxDataProvider
@@ -15,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.context.junit4.SpringRunner
 import java.net.URI
 import java.util.concurrent.CountDownLatch
@@ -28,6 +30,8 @@ class ClientGuiApplicationTests {
 
 	@Autowired
 	lateinit var mxDataProvider: MxDataProvider;
+	@Autowired
+	lateinit var restControler: RestData
 
 //	@Autowired
 //	lateinit var mxSocket: MxSocket;
@@ -45,6 +49,15 @@ class ClientGuiApplicationTests {
 
 		latch.await();
 	}
+
+
+	@Test
+	@WithMockUser(username = "admin", roles= arrayOf("ADMIN"))
+	fun deployContractTest() {
+
+		restControler.deployContract("1")
+	}
+
 
 
 	@Test

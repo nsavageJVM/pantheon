@@ -26,8 +26,7 @@ export default new Vuex.Store({
     accts_bal_query_result: 0,
 
     // contract address
-    sol_addr:' ',
-    sol_name:' ',
+    sol_addr:{empty_addr:' ', simple_storage:' ', power_budget_token:' ' },
     sol_exists:0,
     sol_data:{
           "transactionHash":"",
@@ -101,19 +100,42 @@ export default new Vuex.Store({
       state.accts =  payload;
     },
 
-    setContractAddress(state, payload) {
-  
-      if(payload.solName === "empty") {
-        console.log("store setContractAddress found empty address");
-        state.sol_exists = 0;
-        state.sol_addr =' ';
-      } else {
-        state.sol_exists = 1;
-        state.sol_addr =  payload.solAddr;
-        state.sol_name =  payload.solName;
-        console.log("store setContractAddress set data as "+payload.solAddr+" "+payload.solName);
+    setContractAddressFromDeploy(state, payload ) {
+      console.debug("store setContractAddressFromDeploy payload: "+payload );
+       // not a json array but object keys
+       state.sol_exists = 1;
+       if(payload["solName"]==='SimpleStorage') {
+         state.sol_addr.simple_storage = payload["solAddr"];
+       }
+       if(payload["solName"]==='PowerBudgetToken') {
+         state.sol_addr.power_budget_token =  payload["solAddr"];
+       }
+    },
+
+    setContractAddress(state, payload ) {
+        console.debug("store setContractAddress payload: "+payload );
+ 
+       // let j_arr = JSON.parse(payload);
+       for (var index in payload) {
+        let c_data = payload[index];
+        console.debug("store setContractAddress loop item c_data.solName "+c_data.solName);
+        if(c_data.solName === "empty") {
+          console.debug("store setContractAddress loop continue c_data empty" );
+          continue;     
+        } else {
+          console.debug("store setContractAddress loop else  " );
+          state.sol_exists = 1;
+          if(c_data.solName==='SimpleStorage') {
+            state.sol_addr.simple_storage =  c_data.solAddr;
+          }
+          if(c_data.solName==='PowerBudgetToken') {
+            state.sol_addr.power_budget_token =  c_data.solAddr;
+          }
+
+        }
+
       }
-  
+ 
     },
 
   },

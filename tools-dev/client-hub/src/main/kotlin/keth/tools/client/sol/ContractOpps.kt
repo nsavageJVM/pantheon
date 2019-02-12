@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import keth.tools.client.GlobalConstants
 import keth.tools.client.db.DbManager
+import keth.tools.wrappers.PowerBudgetToken
 import keth.tools.wrappers.SimpleStorage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -19,6 +20,9 @@ import org.web3j.utils.Strings
 import java.io.File
 import java.math.BigInteger
 import java.nio.file.Path
+
+data class Address(var solAddr:String, var solName:String)
+
 
 abstract class ContractBase {
 
@@ -82,7 +86,69 @@ abstract class ContractBase {
  * run test to generate wrapper
  */
 @Service
-class ContractOperations : ContractBase() {
+class SimpleStorageCodeGen : ContractBase() {
+
+    @Autowired
+    lateinit var consts: GlobalConstants
+
+    @Autowired
+    lateinit var db: DbManager
+
+    // need GlobalConstants injected so create in base class
+    override val abiDirPath: Path
+        get() = consts.SOL_PATH
+
+    override val abiDirOutPath: Path
+        get() = consts.BASE_PATH.resolve("pantheon/tools-dev/client-hub/src/main/java")
+
+    override val outFile: File
+        get() = abiDirOutPath.toFile()
+
+    override val abiFile: File
+        get() = abiDirPath.resolve("SimpleStorage.abi").toFile()
+
+    override val binFile: File
+        get() = abiDirPath.resolve("SimpleStorage.bin").toFile()
+
+    //  db.initDb() called in controller
+    fun deployContract(): Address {
+
+        val contract = SimpleStorage.deploy(web3j, getCredentials(), STATIC_GAS_PROVIDER).send();
+        val contractAddress = contract.contractAddress
+
+        db.storeContractAddress(consts.CONTRACT_ADDRESS_KEY_SIMPLE, contractAddress)
+
+
+
+        return  Address(contractAddress,SimpleStorage::class.java.simpleName);
+
+
+    }
+
+    fun getDeployedContract(c_addr:String): SimpleStorage {
+
+        val simple = SimpleStorage
+                .load( c_addr, Web3j.build(HttpService()), getCredentials(), STATIC_GAS_PROVIDER)
+        return simple
+    }
+
+    //== private
+
+    fun getCredentials(): Credentials {
+        val keyPair = consts.loadKeyFile(consts.BOOT_NODE_PATH)
+        val priKeyBytes = keyPair.privateKey.encodedBytes
+        val pairForCredentials = ECKeyPair.create(priKeyBytes.extractArray())
+        return Credentials.create(pairForCredentials)
+    }
+
+
+
+}
+
+
+
+@Service
+class PowerBudgetTokenCodeGen : ContractBase() {
 
     @Autowired
     lateinit var consts: GlobalConstants
@@ -101,29 +167,33 @@ class ContractOperations : ContractBase() {
         get() = abiDirOutPath.toFile()
 
     override val abiFile: File
-        get() = abiDirPath.resolve("SimpleStorage.abi").toFile()
+        get() = abiDirPath.resolve("PowerBudgetToken.abi").toFile()
 
     override val binFile: File
-        get() = abiDirPath.resolve("SimpleStorage.bin").toFile()
+        get() = abiDirPath.resolve("PowerBudgetToken.bin").toFile()
 
     //  db.initDb() called in controller
-    fun deployContract(): String {
+    fun deployContract(): Address {
 
-        val contract = SimpleStorage.deploy(web3j, getCredentials(), STATIC_GAS_PROVIDER).send();
+        var _initialAmount = BigInteger.valueOf(100000)
+        var  _tokenName = "Power Budget Token"
+        var  _decimalUnits =  BigInteger.ONE
+        var  _tokenSymbol = "PBT"
+        val contract = PowerBudgetToken.deploy(web3j, getCredentials(), STATIC_GAS_PROVIDER, _initialAmount, _tokenName, _decimalUnits, _tokenSymbol ).send();
         val contractAddress = contract.contractAddress
 
-        db.storeContractAddress(consts.CONTRACT_ADDRESS_KEY, contractAddress)
+        db.storeContractAddress(consts.CONTRACT_ADDRESS_KEY_POWER, contractAddress)
 
-        return contractAddress;
+        return Address(contractAddress,PowerBudgetToken::class.java.simpleName);
 
 
     }
 
-    fun getDeployedContract(c_addr:String): SimpleStorage {
+    fun getDeployedContract(c_addr:String): PowerBudgetToken {
 
-        val simple = SimpleStorage
+        val powerBudg = PowerBudgetToken
                 .load( c_addr, Web3j.build(HttpService()), getCredentials(), STATIC_GAS_PROVIDER)
-        return simple
+        return powerBudg
     }
 
     //== private

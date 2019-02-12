@@ -55,7 +55,7 @@
           <div v-if="contract_name === 'SimpleStorage' ">
             <SimpleStorage :value="contract_address" />
           </div>
-          <div v-if="contract_name === 'StandardToken'">
+          <div v-if="contract_name === 'PowerBudgetToken' ">
             <StandardToken :value="contract_address" />
           </div>
         </nav>
@@ -114,11 +114,15 @@ export default {
     },
     
     contracts_list() {
-      var sol_name =  this.$store.state.sol_name;
       var sol_addr =  this.$store.state.sol_addr;
-
       var result = {};
-      result[sol_name] = sol_addr;
+      if(sol_addr["simple_storage"] !==' ') {
+         result["SimpleStorage"] = sol_addr["simple_storage"];
+       }
+       if(sol_addr["power_budget_token"] !==' ') {
+         result["PowerBudgetToken"] = sol_addr["power_budget_token"];
+       }
+ 
       return result;
     }
  
